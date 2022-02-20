@@ -1,4 +1,6 @@
 import csv
+import pandas as pd
+from data_preprocessing import data_set_processing
 
 class PlayerBasicStatistic:
     def __init__(self, playerCountry, avgNumberOfKils, avgNumberOfAssits, avgNumberOfDeath, avgMatchRating):
@@ -43,35 +45,37 @@ def readStatisticsForPlayer(playerName):
 
     return PlayerBasicStatistic(playerCountry, sumNumberOfKils/numberOfRecords, sumNumberOfAssits/numberOfRecords, sumNumberOfDeath/numberOfRecords, sumMatchRating/numberOfRecords)
 
-
 def main():
-    team1 = input('Unesi prvi tim: ')
-    team2 = input('Unesi drugi tim: ')
-    team1players = [] 
-    team2players = [] 
+    data_set_processing()
+    print('prosao')
 
-    for i in range(1):
-        team1players.append(input(f'Unesi {i+1}. igraca iz ' + team1 +': '))
+    #team1 = input('Unesi prvi tim: ')
+    #team2 = input('Unesi drugi tim: ')
+    #team1players = [] 
+    #team2players = [] 
 
-    for i in range(1):
-        team2players.append(input(f'Unesi {i+1}. igraca iz ' + team2 +': '))
+    #for i in range(1):
+    #    team1players.append(input(f'Unesi {i+1}. igraca iz ' + team1 +': '))
 
-    playerStatisticsFirstTeam = []
-    playerStatisticsSecondTeam = []
+    #for i in range(1):
+    #    team2players.append(input(f'Unesi {i+1}. igraca iz ' + team2 +': '))
 
-    for playerName in team1players:
-        playerStatisticsFirstTeam.append(readStatisticsForPlayer(playerName))
+    #playerStatisticsFirstTeam = []
+    #playerStatisticsSecondTeam = []
 
-    for playerName in team2players:
-        playerStatisticsSecondTeam.append(readStatisticsForPlayer(playerName))
+    #for playerName in team1players:
+    #    playerStatisticsFirstTeam.append(readStatisticsForPlayer(playerName))
 
-    print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
-    for playerWithStatistics in playerStatisticsFirstTeam:
-        print(playerWithStatistics)
+    #for playerName in team2players:
+    #    playerStatisticsSecondTeam.append(readStatisticsForPlayer(playerName))
 
-    print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
-    for playerWithStatistics in playerStatisticsSecondTeam:
-        print(playerWithStatistics)
+    #print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
+    #for playerWithStatistics in playerStatisticsFirstTeam:
+    #    print(playerWithStatistics)
+
+    #print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
+    #for playerWithStatistics in playerStatisticsSecondTeam:
+    #    print(playerWithStatistics)
 
 if __name__ == "__main__":
     main()
