@@ -2,6 +2,9 @@ import csv
 import pandas as pd
 from data_preprocessing import data_set_processing
 
+from random_forest import RandomForestRegressorAlgorithm
+
+
 class PlayerBasicStatistic:
     def __init__(self, playerCountry, avgNumberOfKils, avgNumberOfAssits, avgNumberOfDeath, avgMatchRating):
         self.playerCountry = playerCountry
@@ -78,4 +81,8 @@ def main():
     #    print(playerWithStatistics)
 
 if __name__ == "__main__":
-    main()
+    #main()
+    
+    rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')
+    rfalg.fit()
+    rfalg.predict()
