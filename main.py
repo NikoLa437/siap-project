@@ -3,6 +3,7 @@ import pandas as pd
 from data_preprocessing import data_set_processing
 
 from random_forest import RandomForestRegressorAlgorithm
+from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 
 
 class PlayerBasicStatistic:
@@ -82,7 +83,11 @@ def main():
 
 if __name__ == "__main__":
     #main()
-    
+
     rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')
     rfalg.fit()
     rfalg.predict()
+
+    bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
+    bst.train()
+    bst.predict()
