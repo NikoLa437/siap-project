@@ -7,7 +7,10 @@ PLAYERS_DATASET_FILE_PATH = 'datasets/players.csv'
 TEAMS_TO_NUM_FILE_PATH = 'datasets/team_to_num.csv'
 PLAYERS_TO_NUM_FILE_PATH = 'datasets/player_to_num.csv'
 MAPS_TO_NUM_FILE_PATH = 'datasets/map_to_num.csv'
+COUTRY_TO_NUM_FILE_PATH= 'datasets/country_to_num.csv'
+PLAYERS_WITH_COUNTRIES_FILE_PATH= 'datasets/player_with_country.csv'
 FINAL_DATASET_FILE_PATH= 'datasets/final.csv'
+FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
 
 
 def save_dict_to_csv_file(data, file, header):
@@ -19,6 +22,22 @@ def save_dict_to_csv_file(data, file, header):
                 writer.writerow([key, value])
     except IOError:
         print("I/O error")
+
+def convert_country_to_num():
+    df = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
+    X = df[["country", 'player_name']]
+    set_of_countries = set(list(X['country']))
+
+    country_to_num = dict(zip(set_of_countries, range(len(set_of_countries))))
+
+    player_with_country = {}
+    for index, row in X.iterrows():
+        player_with_country[row['player_name']] = country_to_num[row['country']]
+
+    save_dict_to_csv_file(country_to_num, COUTRY_TO_NUM_FILE_PATH, ['country', 'country_number'])
+    save_dict_to_csv_file(player_with_country, PLAYERS_WITH_COUNTRIES_FILE_PATH, ['player_name', 'country_number'])
+
+    return player_with_country;
 
 def convert_team_to_num():
     df = pd.read_csv(RESULTS_DATASET_FILE_PATH,  encoding='utf-8')
@@ -57,6 +76,7 @@ def data_set_processing():
     team_to_num = convert_team_to_num()
     player_to_num = convert_player_to_num()
     map_to_num = convert_map_to_num()
+    country_to_num = convert_country_to_num()
 
     grouped_by_match_id= df.groupby(['match_id'])
     dicts_array = []
@@ -97,10 +117,12 @@ def data_set_processing():
                 if(team_to_num[row['team']]==dicts['team_1']): # is this player in team1
                     dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
                     dicts['player_' + str(team1num) + '_team_1'] = player_to_num[row['player_name']]
+                    dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
                     team1num=team1num+1 # increase team1 players
                 else: #  this player is in team1
                     dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
                     dicts['player_' + str(team2num) + '_team_2'] = player_to_num[row['player_name']]
+                    dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
                     team2num=team2num+1  # increase team1 players
 
             if(hasPlayers==False): # if we haven't valid player data skip this match
@@ -115,4 +137,4 @@ def data_set_processing():
             dicts_array.append(dicts)
 
     df = pd.DataFrame.from_dict(dicts_array) 
-    df.to_csv (FINAL_DATASET_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_WITH_COUNTRY_FILE_PATH, index = False, header=True)

@@ -17,10 +17,10 @@ class RandomForestRegressorAlgorithm():
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(x, y, test_size=0.2,
                                                                                 random_state=random_state)
         parameters = {
-            "rf__n_estimators": 400,
+            "rf__n_estimators": 600,
             "rf__max_features": 'auto',
             "rf__max_depth": 15,
-            "rf__min_samples_leaf": 1,
+            "rf__min_samples_leaf": 2,
             "rf__min_samples_split": 2,
             'rf__criterion': 'squared_error',
             'verbose': 1
@@ -50,15 +50,25 @@ class RandomForestRegressorAlgorithm():
                     x.append(
                         [matchData['team_1'], matchData['team_2'], matchData['team1_rank'], matchData['team2_rank'],
                          matchData[f'{"map_"}{z}'], matchData['player_1_team_1'], matchData['player_1_team_1_rating'],
+                         matchData['player_1_team_1_country'],
                          matchData['player_2_team_1'], matchData['player_2_team_1_rating'],
+                         matchData['player_2_team_1_country'],
                          matchData['player_3_team_1'], matchData['player_3_team_1_rating'],
+                         matchData['player_3_team_1_country'],
                          matchData['player_4_team_1'], matchData['player_4_team_1_rating'],
+                         matchData['player_4_team_1_country'],
                          matchData['player_5_team_1'], matchData['player_5_team_1_rating'],
+                         matchData['player_5_team_1_country'],
                          matchData['player_1_team_2'], matchData['player_1_team_2_rating'],
+                         matchData['player_1_team_2_country'],
                          matchData['player_2_team_2'], matchData['player_2_team_2_rating'],
+                         matchData['player_2_team_2_country'],
                          matchData['player_3_team_2'], matchData['player_3_team_2_rating'],
+                         matchData['player_3_team_2_country'],
                          matchData['player_4_team_2'], matchData['player_4_team_2_rating'],
-                         matchData['player_5_team_2'], matchData['player_5_team_2_rating']])
+                         matchData['player_4_team_2_country'],
+                         matchData['player_5_team_2'], matchData['player_5_team_2_rating'],
+                         matchData['player_5_team_2_country'],])
                     y.append(matchData[f'{"map_"}{z}{"_winner"}'])
 
         return np.array(x), y
@@ -86,4 +96,8 @@ class RandomForestRegressorAlgorithm():
                or math.isnan(match_data['player_5_team_1']) or math.isnan(match_data['player_5_team_1_rating']) or math.isnan(match_data['player_1_team_2'])\
                or math.isnan(match_data['player_1_team_2_rating']) or math.isnan(match_data['player_2_team_2']) or math.isnan(match_data['player_2_team_2_rating'])\
                or math.isnan(match_data['player_3_team_2']) or math.isnan(match_data['player_3_team_2_rating']) or math.isnan(match_data['player_4_team_2'])\
-               or math.isnan(match_data['player_4_team_2_rating']) or math.isnan(match_data['player_5_team_2']) or math.isnan(match_data['player_5_team_2_rating'])
+               or math.isnan(match_data['player_4_team_2_rating']) or math.isnan(match_data['player_5_team_2']) or math.isnan(match_data['player_5_team_2_rating'])\
+               or math.isnan(match_data['player_1_team_1_country']) or math.isnan(match_data['player_2_team_1_country']) or math.isnan(match_data['player_3_team_1_country']) \
+               or math.isnan(match_data['player_4_team_1_country']) or math.isnan(match_data['player_5_team_1_country']) or math.isnan(match_data['player_1_team_2_country']) \
+               or math.isnan(match_data['player_2_team_2_country']) or math.isnan(match_data['player_3_team_2_country']) or math.isnan(match_data['player_4_team_2_country']) \
+               or math.isnan(match_data['player_5_team_2_country'])

@@ -1,6 +1,6 @@
 import csv
 import pandas as pd
-from data_preprocessing import data_set_processing
+from data_preprocessing import data_set_processing, convert_country_to_num
 
 from random_forest import RandomForestRegressorAlgorithm
 from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
@@ -82,12 +82,13 @@ def main():
     #    print(playerWithStatistics)
 
 if __name__ == "__main__":
-    #main()
+    # main()
 
-    rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')
+    # convert_country_to_num()
+    rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')
     rfalg.fit()
     rfalg.predict()
-
-    bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
-    bst.train()
-    bst.predict()
+    #
+    # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
+    # bst.train()
+    # bst.predict()
