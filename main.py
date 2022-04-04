@@ -85,7 +85,8 @@ if __name__ == "__main__":
     # main()
 
     # convert_country_to_num()
-    rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')
+    rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')#.with_country()
+    rfalg.load_data()
     rfalg.fit()
     rfalg.predict()
     #
