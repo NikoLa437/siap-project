@@ -64,7 +64,7 @@ class RandomForestRegressorAlgorithm():
                                   match_data['player_4_team_2'], match_data['player_4_team_2_rating'],
                                   match_data['player_5_team_2'], match_data['player_5_team_2_rating']]
 
-                    if (self.use_country_data):
+                    if self.use_country_data:
                         train_data += self.get_country_data(match_data)
 
                     x.append(train_data)
