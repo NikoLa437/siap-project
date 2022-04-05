@@ -85,11 +85,13 @@ if __name__ == "__main__":
     # main()
 
     # convert_country_to_num()
-    rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')#.with_country()
-    rfalg.load_data()
-    rfalg.fit()
-    rfalg.predict()
+    # data_set_processing()
+
+    # rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')#.with_country()
+    # rfalg.load_data()
+    # rfalg.fit()
+    # rfalg.predict()
     #
-    # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
-    # bst.train()
-    # bst.predict()
+    bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
+    bst.train()
+    bst.predict()

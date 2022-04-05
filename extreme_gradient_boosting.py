@@ -32,18 +32,32 @@ class ExtremeGradientBoostingAlgorithm():
         for index, matchData in matches.iterrows():
             for z in range(1, 4, 1):
                 if not self.chech_if_not_valid_row(matchData, f'{"map_"}{z}'):
+                    # x.append(
+                    #     [matchData['team_1'], matchData['team_2'], matchData['team1_rank'], matchData['team2_rank'],
+                    #      matchData[f'{"map_"}{z}'], matchData['player_1_team_1'], matchData['player_1_team_1_rating'],
+                    #      matchData['player_2_team_1'], matchData['player_2_team_1_rating'],
+                    #      matchData['player_3_team_1'], matchData['player_3_team_1_rating'],
+                    #      matchData['player_4_team_1'], matchData['player_4_team_1_rating'],
+                    #      matchData['player_5_team_1'], matchData['player_5_team_1_rating'],
+                    #      matchData['player_1_team_2'], matchData['player_1_team_2_rating'],
+                    #      matchData['player_2_team_2'], matchData['player_2_team_2_rating'],
+                    #      matchData['player_3_team_2'], matchData['player_3_team_2_rating'],
+                    #      matchData['player_4_team_2'], matchData['player_4_team_2_rating'],
+                    #      matchData['player_5_team_2'], matchData['player_5_team_2_rating']])
+
                     x.append(
                         [matchData['team_1'], matchData['team_2'], matchData['team1_rank'], matchData['team2_rank'],
-                         matchData[f'{"map_"}{z}'], matchData['player_1_team_1'], matchData['player_1_team_1_rating'],
-                         matchData['player_2_team_1'], matchData['player_2_team_1_rating'],
-                         matchData['player_3_team_1'], matchData['player_3_team_1_rating'],
-                         matchData['player_4_team_1'], matchData['player_4_team_1_rating'],
-                         matchData['player_5_team_1'], matchData['player_5_team_1_rating'],
-                         matchData['player_1_team_2'], matchData['player_1_team_2_rating'],
-                         matchData['player_2_team_2'], matchData['player_2_team_2_rating'],
-                         matchData['player_3_team_2'], matchData['player_3_team_2_rating'],
-                         matchData['player_4_team_2'], matchData['player_4_team_2_rating'],
-                         matchData['player_5_team_2'], matchData['player_5_team_2_rating']])
+                         matchData[f'{"map_"}{z}'], matchData['player_1_team_1'], matchData['player_1_team_1_custom_rating'],
+                         matchData['player_2_team_1'], matchData['player_2_team_1_custom_rating'],
+                         matchData['player_3_team_1'], matchData['player_3_team_1_custom_rating'],
+                         matchData['player_4_team_1'], matchData['player_4_team_1_custom_rating'],
+                         matchData['player_5_team_1'], matchData['player_5_team_1_custom_rating'],
+                         matchData['player_1_team_2'], matchData['player_1_team_2_custom_rating'],
+                         matchData['player_2_team_2'], matchData['player_2_team_2_custom_rating'],
+                         matchData['player_3_team_2'], matchData['player_3_team_2_custom_rating'],
+                         matchData['player_4_team_2'], matchData['player_4_team_2_custom_rating'],
+                         matchData['player_5_team_2'], matchData['player_5_team_2_custom_rating']])
+
                     y.append(matchData[f'{"map_"}{z}{"_winner"}'] - 1)
 
         return np.array(x), y

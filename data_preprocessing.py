@@ -118,11 +118,32 @@ def data_set_processing():
                     dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
                     dicts['player_' + str(team1num) + '_team_1'] = player_to_num[row['player_name']]
                     dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
+                    dicts['player_' + str(team1num) + '_team_1_kills'] = row['kills']
+                    dicts['player_' + str(team1num) + '_team_1_assists'] = row['assists']
+                    dicts['player_' + str(team1num) + '_team_1_deaths'] = row['deaths']
+                    dicts['player_' + str(team1num) + '_team_1_hs'] = row['hs']
+                    dicts['player_' + str(team1num) + '_team_1_kast'] = row['kast']
+                    dicts['player_' + str(team1num) + '_team_1_kddiff'] = row['kddiff']
+                    dicts['player_' + str(team1num) + '_team_1_adr'] = row['adr']
+                    dicts['player_' + str(team1num) + '_team_1_fkdiff'] = row['fkdiff']
+                    # 0.0073*KAST + 0.3591*KPR + -0.5329*DPR + 0.2372*Impact + 0.0032*ADR + 0.1587 ≈ Rating 2.0
+                    custom_rating = -0.5 * row['deaths'] + 0.35 * row['kills'] + 0.1 * row['assists'] + 0.003 * 25 * row['adr'] + 0.007 * row['kast'] + 0.05 * row['hs'] + 0.1 * row['fkdiff']
+                    dicts['player_' + str(team1num) + '_team_1_custom_rating'] = custom_rating
                     team1num=team1num+1 # increase team1 players
                 else: #  this player is in team1
                     dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
                     dicts['player_' + str(team2num) + '_team_2'] = player_to_num[row['player_name']]
                     dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
+                    dicts['player_' + str(team2num) + '_team_2_kills'] = row['kills']
+                    dicts['player_' + str(team2num) + '_team_2_assists'] = row['assists']
+                    dicts['player_' + str(team2num) + '_team_2_deaths'] = row['deaths']
+                    dicts['player_' + str(team2num) + '_team_2_hs'] = row['hs']
+                    dicts['player_' + str(team2num) + '_team_2_kast'] = row['kast']
+                    dicts['player_' + str(team2num) + '_team_2_kddiff'] = row['kddiff']
+                    dicts['player_' + str(team2num) + '_team_2_adr'] = row['adr']
+                    dicts['player_' + str(team2num) + '_team_2_fkdiff'] = row['fkdiff']
+                    custom_rating = -0.5 * row['deaths'] + 0.35 * row['kills'] + 0.1 * row['assists'] + 0.003 * 25 * row['adr'] + 0.007 * row['kast'] + 0.05 * row['hs'] + 0.1 * row['fkdiff']
+                    dicts['player_' + str(team2num) + '_team_2_custom_rating'] = custom_rating
                     team2num=team2num+1  # increase team1 players
 
             if(hasPlayers==False): # if we haven't valid player data skip this match
@@ -137,4 +158,4 @@ def data_set_processing():
             dicts_array.append(dicts)
 
     df = pd.DataFrame.from_dict(dicts_array) 
-    df.to_csv (FINAL_DATASET_WITH_COUNTRY_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_FILE_PATH, index = False, header=True)
