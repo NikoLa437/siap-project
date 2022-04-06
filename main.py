@@ -1,10 +1,11 @@
 import csv
 import pandas as pd
-from data_preprocessing import data_set_processing, convert_country_to_num
+from data_preprocessing import data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
 
 from random_forest import RandomForestRegressorAlgorithm
 from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 
+from algorithms.factory import AlgorithmFactory
 
 class PlayerBasicStatistic:
     def __init__(self, playerCountry, avgNumberOfKils, avgNumberOfAssits, avgNumberOfDeath, avgMatchRating):
@@ -83,13 +84,19 @@ def main():
 
 if __name__ == "__main__":
     # main()
-
+    # average_ranking_for_players()
     # convert_country_to_num()
-    rfalg = RandomForestRegressorAlgorithm('datasets/final_with_country.csv')#.with_country()
-    rfalg.load_data()
-    rfalg.fit()
-    rfalg.predict()
-    #
+    # convert_country_to_num()
+    # rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')#.with_country()
+    # rfalg.load_data()
+    # rfalg.fit()
+    # rfalg.predict()
+
+    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[0], FINAL_DATASET_FILE_PATH)#.with_country()
+    random_forest_alg.load_data()
+    random_forest_alg.fit()
+    random_forest_alg.predict()
+
     # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
     # bst.train()
     # bst.predict()
