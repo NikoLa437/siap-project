@@ -5,6 +5,7 @@ from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from data_preprocessing import PLAYERS_AVG_RATING_FILE_PATH
 import numpy as np
 
 random_state = 42
@@ -18,7 +19,7 @@ class RandomForestRegressorAlgorithm():
             "rf__n_estimators": 500,
             "rf__max_features": 'auto',
             "rf__max_depth": 15,
-            "rf__min_samples_leaf": 2,
+            "rf__min_samples_leaf": 1,
             "rf__min_samples_split": 2,
             'rf__criterion': 'squared_error',
             'verbose': 1
@@ -62,7 +63,17 @@ class RandomForestRegressorAlgorithm():
                                   match_data['player_2_team_2'], match_data['player_2_team_2_rating'],
                                   match_data['player_3_team_2'], match_data['player_3_team_2_rating'],
                                   match_data['player_4_team_2'], match_data['player_4_team_2_rating'],
-                                  match_data['player_5_team_2'], match_data['player_5_team_2_rating']]
+                                  match_data['player_5_team_2'], match_data['player_5_team_2_rating'],
+                                  match_data['player_1_team_1_name'],
+                                  match_data['player_2_team_1_name'],
+                                  match_data['player_3_team_1_name'],
+                                  match_data['player_4_team_1_name'],
+                                  match_data['player_5_team_1_name'],
+                                  match_data['player_1_team_2_name'],
+                                  match_data['player_2_team_2_name'],
+                                  match_data['player_3_team_2_name'],
+                                  match_data['player_4_team_2_name'],
+                                  match_data['player_5_team_2_name'], ]
 
                     if self.use_country_data:
                         train_data += self.get_country_data(match_data)
@@ -72,6 +83,39 @@ class RandomForestRegressorAlgorithm():
 
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(np.array(x), y, test_size=0.2,
                                                                                 random_state=random_state)
+
+        self.replace_test_input_rating_with_avg()
+        self.remove_unused_rows()
+       # print(self.x_test)
+
+    def remove_unused_rows(self):
+        new_x_test = []
+        new_x_train = []
+        for index, val in enumerate(self.x_test):
+            new_x_test.append(val[0:-10 if not self.use_country_data else -20])
+
+        for index, val in enumerate(self.x_train):
+            new_x_train.append(val[0:-10 if not self.use_country_data else -20])
+
+        self.x_test = new_x_test
+        self.x_train = new_x_train
+
+
+    def replace_test_input_rating_with_avg(self):
+        players_ratings = pd.read_csv(PLAYERS_AVG_RATING_FILE_PATH, delimiter=',', encoding="utf8")
+        ratings_dict = dict(players_ratings.values)
+        for row in self.x_test:
+            row[6] = ratings_dict[row[-10 if not self.use_country_data else -20]]
+            row[8] = ratings_dict[row[-9 if not self.use_country_data else -19]]
+            row[10] = ratings_dict[row[-8 if not self.use_country_data else -18]]
+            row[12] = ratings_dict[row[-7 if not self.use_country_data else -17]]
+            row[14] = ratings_dict[row[-6 if not self.use_country_data else -16]]
+            row[16] = ratings_dict[row[-5 if not self.use_country_data else -15]]
+            row[18] = ratings_dict[row[-4 if not self.use_country_data else -14]]
+            row[20] = ratings_dict[row[-3 if not self.use_country_data else -13]]
+            row[22] = ratings_dict[row[-2 if not self.use_country_data else -12]]
+            row[24] = ratings_dict[row[-1 if not self.use_country_data else -11]]
+
 
     def get_country_data(self, match_data):
         return [match_data['player_1_team_1_country'], match_data['player_2_team_1_country'],
@@ -100,34 +144,45 @@ class RandomForestRegressorAlgorithm():
         return valid and self.check_country_data(match_data)
 
     def check_standard_data(self, match_data, current_map):
-        return not(math.isnan(match_data[current_map]) or math.isnan(match_data['team_1']) or math.isnan(
+        return not (math.isnan(match_data[current_map]) or math.isnan(match_data['team_1']) or math.isnan(
             match_data['team_2']) or math.isnan(match_data['team2_rank'])
-                   or math.isnan(match_data['team1_rank']) or math.isnan(match_data['player_1_team_1']) or math.isnan(
-            match_data['player_1_team_1_rating'])
-                   or math.isnan(match_data['player_2_team_1']) or math.isnan(
-            match_data['player_2_team_1_rating']) or math.isnan(
-            match_data['player_3_team_1'])
-                   or math.isnan(match_data['player_3_team_1_rating']) or math.isnan(
-            match_data['player_4_team_1']) or math.isnan(
-            match_data['player_4_team_1_rating'])
-                   or math.isnan(match_data['player_5_team_1']) or math.isnan(
-            match_data['player_5_team_1_rating']) or math.isnan(
-            match_data['player_1_team_2'])
-                   or math.isnan(match_data['player_1_team_2_rating']) or math.isnan(
-            match_data['player_2_team_2']) or math.isnan(
-            match_data['player_2_team_2_rating'])
-                   or math.isnan(match_data['player_3_team_2']) or math.isnan(
-            match_data['player_3_team_2_rating']) or math.isnan(
-            match_data['player_4_team_2'])
-                   or math.isnan(match_data['player_4_team_2_rating']) or math.isnan(
-            match_data['player_5_team_2']) or math.isnan(
-            match_data['player_5_team_2_rating']))
+                    or math.isnan(match_data['team1_rank']) or math.isnan(match_data['player_1_team_1']) or math.isnan(
+                    match_data['player_1_team_1_rating'])
+                    or math.isnan(match_data['player_2_team_1']) or math.isnan(
+                    match_data['player_2_team_1_rating']) or math.isnan(
+                    match_data['player_3_team_1'])
+                    or math.isnan(match_data['player_3_team_1_rating']) or math.isnan(
+                    match_data['player_4_team_1']) or math.isnan(
+                    match_data['player_4_team_1_rating'])
+                    or math.isnan(match_data['player_5_team_1']) or math.isnan(
+                    match_data['player_5_team_1_rating']) or math.isnan(
+                    match_data['player_1_team_2'])
+                    or math.isnan(match_data['player_1_team_2_rating']) or math.isnan(
+                    match_data['player_2_team_2']) or math.isnan(
+                    match_data['player_2_team_2_rating'])
+                    or math.isnan(match_data['player_3_team_2']) or math.isnan(
+                    match_data['player_3_team_2_rating']) or math.isnan(
+                    match_data['player_4_team_2'])
+                    or math.isnan(match_data['player_4_team_2_rating']) or math.isnan(
+                    match_data['player_5_team_2']) or math.isnan(
+                     match_data['player_5_team_2_rating']) #or
+                    # math.isnan(match_data['player_1_team_1_name']) or
+                    # math.isnan(match_data['player_2_team_1_name']) or
+                    # math.isnan(match_data['player_3_team_1_name']) or
+                    # math.isnan(match_data['player_4_team_1_name']) or
+                    # math.isnan(match_data['player_5_team_1_name']) or
+                    # math.isnan(match_data['player_1_team_2_name']) or
+                    # math.isnan(match_data['player_2_team_2_name']) or
+                    # math.isnan(match_data['player_3_team_2_name']) or
+                    # math.isnan(match_data['player_4_team_2_name']) or
+                    # math.isnan(match_data['player_5_team_2_name'])
+                    )
 
     def check_country_data(self, match_data):
-        return not(math.isnan(match_data['player_1_team_1_country']) or math.isnan(
+        return not (math.isnan(match_data['player_1_team_1_country']) or math.isnan(
             match_data['player_2_team_1_country']) or math.isnan(match_data['player_3_team_1_country'])
-                   or math.isnan(match_data['player_4_team_1_country']) or math.isnan(
-            match_data['player_5_team_1_country']) or math.isnan(match_data['player_1_team_2_country'])
-                   or math.isnan(match_data['player_2_team_2_country']) or math.isnan(
-            match_data['player_3_team_2_country']) or math.isnan(match_data['player_4_team_2_country'])
-                   or math.isnan(match_data['player_5_team_2_country'])) if self.use_country_data else True
+                    or math.isnan(match_data['player_4_team_1_country']) or math.isnan(
+                    match_data['player_5_team_1_country']) or math.isnan(match_data['player_1_team_2_country'])
+                    or math.isnan(match_data['player_2_team_2_country']) or math.isnan(
+                    match_data['player_3_team_2_country']) or math.isnan(match_data['player_4_team_2_country'])
+                    or math.isnan(match_data['player_5_team_2_country'])) if self.use_country_data else True
