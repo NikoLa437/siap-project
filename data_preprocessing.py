@@ -12,6 +12,7 @@ PLAYERS_WITH_COUNTRIES_FILE_PATH= 'datasets/player_with_country.csv'
 FINAL_DATASET_FILE_PATH= 'datasets/final.csv'
 FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
 PLAYERS_AVG_RATING_FILE_PATH= 'datasets/players_avg_rating.csv'
+PLAYER_WITH_COUNTRY_AVG_RATING = 'datasets/player_country_with_avg_rating.csv'
 
 
 def save_dict_to_csv_file(data, file, header):
@@ -23,6 +24,18 @@ def save_dict_to_csv_file(data, file, header):
                 writer.writerow([key, value])
     except IOError:
         print("I/O error")
+
+
+def merge_country_and_avg_rating():
+    players_avg_rating = pd.read_csv(PLAYERS_AVG_RATING_FILE_PATH,  encoding='utf-8')
+    players_countries = pd.read_csv(PLAYERS_WITH_COUNTRIES_FILE_PATH,  encoding='utf-8')
+    merged_data = pd.merge(players_avg_rating, players_countries, on='player_name')
+
+    avg_players_rating_by_country = merged_data.groupby('country_number', as_index=False)['rating'].mean()
+    final_merge = pd.merge(players_countries, avg_players_rating_by_country, on='country_number')
+
+    #final_merge[['player_name', 'rating']].to_csv(PLAYER_WITH_COUNTRY_AVG_RATING, encoding='utf-8', index=False)
+    #print(pd.read_csv(PLAYER_WITH_COUNTRY_AVG_RATING,  encoding='utf-8').set_index("player_name")['rating'].to_dict())
 
 
 def average_ranking_for_players():
@@ -85,6 +98,7 @@ def data_set_processing():
     player_to_num = convert_player_to_num()
     map_to_num = convert_map_to_num()
     country_to_num = convert_country_to_num()
+    player_w_avg_country_rating = pd.read_csv(PLAYER_WITH_COUNTRY_AVG_RATING,  encoding='utf-8').set_index("player_name")['rating'].to_dict()
 
     grouped_by_match_id= df.groupby(['match_id'])
     dicts_array = []
@@ -123,16 +137,20 @@ def data_set_processing():
                     break;
 
                 if(team_to_num[row['team']]==dicts['team_1']): # is this player in team1
-                   # dicts['player_' + str(team1num) + '_team_1_name'] = row['player_name']
+                    dicts['player_' + str(team1num) + '_team_1_name'] = row['player_name']
                     dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
                     dicts['player_' + str(team1num) + '_team_1'] = player_to_num[row['player_name']]
-                   # dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
+                    #dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
+                    #dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
+
                     team1num=team1num+1 # increase team1 players
                 else: #  this player is in team1
-                    #dicts['player_' + str(team2num) + '_team_2_name'] = row['player_name']
+                    dicts['player_' + str(team2num) + '_team_2_name'] = row['player_name']
                     dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
                     dicts['player_' + str(team2num) + '_team_2'] = player_to_num[row['player_name']]
-                    # dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
+                    #dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
+                    #dicts['player_' + str(team1num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
+
                     team2num=team2num+1  # increase team1 players
 
             if(hasPlayers==False): # if we haven't valid player data skip this match
