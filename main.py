@@ -1,6 +1,6 @@
 import csv
 import pandas as pd
-from data_preprocessing import data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
+from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
 
 from random_forest import RandomForestRegressorAlgorithm
 from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
@@ -91,8 +91,8 @@ if __name__ == "__main__":
     # rfalg.load_data()
     # rfalg.fit()
     # rfalg.predict()
-
-    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[0], FINAL_DATASET_FILE_PATH)#.with_country()
+    # merge_country_and_avg_rating()
+    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[0], FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country()
     random_forest_alg.load_data()
     random_forest_alg.fit()
     random_forest_alg.predict()
