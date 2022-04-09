@@ -26,10 +26,13 @@ def save_dict_to_csv_file(data, file, header):
 
 def average_k_means_data_for_players():
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
-    avg_players_rating = players_matches.groupby('player_name', as_index=False)['kills','assists','deaths','hs', 'rating'].mean()
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills','assists','deaths','hs', 'rating'].mean()
     dictsArray = []
+
     for item in avg_players_rating.values:
         dicts = {}
+
+        dicts['player_name'] =item[0]
         dicts['kills'] = item[1]
         dicts['assists'] = item[2]
         dicts['deaths'] = item[3]
@@ -39,12 +42,13 @@ def average_k_means_data_for_players():
         dictsArray.append(dicts)
 
     df = pd.DataFrame.from_dict(dictsArray) 
+
     df.to_csv(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, index = False, header=True)
 
-def average_ranking_for_players():
+def average_k_means_data_for_specific_player(player_name):
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
-    avg_players_rating = players_matches.groupby('player_name', as_index=False)['rating'].mean()
-    save_dict_to_csv_file(dict(avg_players_rating.values), PLAYERS_AVG_RATING_FILE_PATH, ['player_name', 'avg_rating'])
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills','assists','deaths','hs', 'rating'].mean()
+
 
 def convert_country_to_num():
     df = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
