@@ -12,7 +12,7 @@ PLAYERS_WITH_COUNTRIES_FILE_PATH= 'datasets/player_with_country.csv'
 FINAL_DATASET_FILE_PATH= 'datasets/final.csv'
 FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
 PLAYERS_AVG_RATING_FILE_PATH= 'datasets/players_avg_rating.csv'
-
+PLAYERS_AVG_K_MEANS_DATA_FILE_PATH= 'datasets/players_avg_kmeans_data.csv'
 
 def save_dict_to_csv_file(data, file, header):
     try:
@@ -24,6 +24,22 @@ def save_dict_to_csv_file(data, file, header):
     except IOError:
         print("I/O error")
 
+def average_k_means_data_for_players():
+    players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['kills','assists','deaths','hs', 'rating'].mean()
+    dictsArray = []
+    for item in avg_players_rating.values:
+        dicts = {}
+        dicts['kills'] = item[1]
+        dicts['assists'] = item[2]
+        dicts['deaths'] = item[3]
+        dicts['hs'] = item[4]
+        dicts['rating'] = item[5]
+
+        dictsArray.append(dicts)
+
+    df = pd.DataFrame.from_dict(dictsArray) 
+    df.to_csv(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, index = False, header=True)
 
 def average_ranking_for_players():
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
