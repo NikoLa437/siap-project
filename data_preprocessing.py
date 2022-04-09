@@ -37,6 +37,8 @@ def merge_country_and_avg_rating():
     #final_merge[['player_name', 'rating']].to_csv(PLAYER_WITH_COUNTRY_AVG_RATING, encoding='utf-8', index=False)
     #print(pd.read_csv(PLAYER_WITH_COUNTRY_AVG_RATING,  encoding='utf-8').set_index("player_name")['rating'].to_dict())
 
+def get_country_percentage_in_dataset(count_countries_dict, player_num, country_num):
+    return count_countries_dict[country_num]/player_num
 
 def average_ranking_for_players():
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
@@ -58,7 +60,7 @@ def convert_country_to_num():
     save_dict_to_csv_file(country_to_num, COUTRY_TO_NUM_FILE_PATH, ['country', 'country_number'])
     save_dict_to_csv_file(player_with_country, PLAYERS_WITH_COUNTRIES_FILE_PATH, ['player_name', 'country_number'])
 
-    return player_with_country;
+    return player_with_country
 
 def convert_team_to_num():
     df = pd.read_csv(RESULTS_DATASET_FILE_PATH,  encoding='utf-8')
@@ -140,16 +142,16 @@ def data_set_processing():
                     dicts['player_' + str(team1num) + '_team_1_name'] = row['player_name']
                     dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
                     dicts['player_' + str(team1num) + '_team_1'] = player_to_num[row['player_name']]
-                    #dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
-                    #dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
+                    dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
+                    dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
 
                     team1num=team1num+1 # increase team1 players
                 else: #  this player is in team1
                     dicts['player_' + str(team2num) + '_team_2_name'] = row['player_name']
                     dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
                     dicts['player_' + str(team2num) + '_team_2'] = player_to_num[row['player_name']]
-                    #dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
-                    #dicts['player_' + str(team1num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
+                    dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
+                    dicts['player_' + str(team2num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
 
                     team2num=team2num+1  # increase team1 players
 
@@ -165,4 +167,4 @@ def data_set_processing():
             dicts_array.append(dicts)
 
     df = pd.DataFrame.from_dict(dicts_array) 
-    df.to_csv (FINAL_DATASET_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_WITH_COUNTRY_FILE_PATH, index = False, header=True)
