@@ -1,13 +1,19 @@
 import csv
 import pandas as pd
+from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
 
 # from algorithms.neural_network import NeuralNetwork
+<<<<<<< HEAD
 #from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, average_rating_for_players_for_kmeans, data_set_processing, \
     FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH, PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, PLAYERS_WITH_KMEANS_CLUSTER_PATH
 
+=======
+from algorithms.neural_network import NeuralNetwork
+from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
+    FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
+>>>>>>> main
 from random_forest import RandomForestRegressorAlgorithm
-from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 
 from algorithms.factory import AlgorithmFactory
 from algorithms.kmeans import KmeansAlgorithm
@@ -63,10 +69,15 @@ def readStatisticsForPlayer(playerName):
                                 sumNumberOfDeath / numberOfRecords, sumMatchRating / numberOfRecords)
 
 
+<<<<<<< HEAD
 def testKMeans():
     print('test')
     
     #average_rating_for_players_for_kmeans()
+=======
+def main():
+    data_set_processing()
+>>>>>>> main
 
     #kmeans = KmeansAlgorithm('datasets/players_avg_kmeans_data.csv')
     #kmeans.fit(5)
@@ -114,6 +125,7 @@ if __name__ == "__main__":
     # average_ranking_for_players()
     # convert_country_to_num()
     # convert_country_to_num()
+    # data_set_processing()
     # rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')#.with_country()
     # rfalg.load_data()
     # rfalg.fit()
@@ -128,16 +140,50 @@ if __name__ == "__main__":
                                                  FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH)#.with_country(use_commonness=True)
     # # False, True, False,
     # #                                                                                                False, False)
-    random_forest_alg.load_data()
-    random_forest_alg.fit()
-    random_forest_alg.predict()
+    # random_forest_alg.load_data()
+    # random_forest_alg.fit()
+    # random_forest_alg.predict()
+    # for algorithm_name in AlgorithmFactory.get_algorithm_names():
+    #     # alg = AlgorithmFactory.create(algorithm_name, FINAL_DATASET_CUSTOM_RATING_FILE_PATH)#.with_custom_rating()
+    #     # alg.with_country(use_players_country=True, use_avg_country_rating=True, use_commonness=True,
+    #     #                  use_players_country_percentage=True, use_avg_team_country_rating=True)
+    #     if algorithm_name == "RANDOM_FOREST_REGRESSOR":
+    #         for i in range(5):
+    #             alg = AlgorithmFactory.create(algorithm_name, FINAL_DATASET_CUSTOM_RATING_FILE_PATH).with_custom_rating()
+    #
+    #             if i == 0:
+    #                 alg.with_country(use_players_country=True)
+    #             elif i == 1:
+    #                 alg.with_country(use_avg_country_rating=True)
+    #             elif i == 2:
+    #                 alg.with_country(use_commonness=True)
+    #             elif i == 3:
+    #                 alg.with_country(use_players_country_percentage=True)
+    #             elif i == 4:
+    #                 alg.with_country(use_avg_team_country_rating=True)
+    #
+    #             alg.load_data()
+    #             alg.fit()
+    #             alg.predict()
 
-    #ove 4 sam zakomentarisao
-    #nnetwork = NeuralNetwork(FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
-    #nnetwork.load_data()
-    #nnetwork.fit()
-    #nnetwork.predict()
+    # nnetwork = NeuralNetwork(FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
+    # nnetwork.load_data()
+    # nnetwork.fit()
+    # nnetwork.predict()
 
     # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
     # bst.train()
     # bst.predict()
+
+    # extreme_gradient_boosting_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+    #                                                         FINAL_DATASET_CUSTOM_RATING_FILE_PATH).with_custom_rating()
+    # extreme_gradient_boosting_alg.load_data()
+    # extreme_gradient_boosting_alg.fit()
+    # extreme_gradient_boosting_alg.predict()
+
+    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+                                                FINAL_DATASET_CUSTOM_RATING_FILE_PATH).with_custom_rating()#.with_country()
+    random_forest_alg.load_data()
+    random_forest_alg.fit()
+    random_forest_alg.predict()
+

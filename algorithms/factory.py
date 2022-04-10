@@ -30,16 +30,24 @@ class AlgorithmFactory:
 
     @staticmethod
     def create_random_forest_regressor(data_path_or_data):
+        # parameters = {
+        #     "rf__n_estimators": 500,
+        #     "rf__max_features": 'auto',
+        #     "rf__max_depth": 15,
+        #     "rf__min_samples_leaf": 1,
+        #     "rf__min_samples_split": 2,
+        #     'rf__criterion': 'squared_error',
+        #     'verbose': 1
+        # }
         parameters = {
-            "rf__n_estimators": 500,
-            "rf__max_features": 'auto',
-            "rf__max_depth": 15,
+            "rf__n_estimators": 400,
+            "rf__max_features": 4,
+            "rf__max_depth": 10,
             "rf__min_samples_leaf": 1,
-            "rf__min_samples_split": 2,
+            "rf__min_samples_split": 5,
             'rf__criterion': 'squared_error',
             'verbose': 1
         }
-
         return RandomForestRegressorAlgorithm(data_path_or_data, parameters)
 
     @staticmethod
