@@ -1,5 +1,3 @@
-from abc import abstractmethod
-
 from algorithms.algorithm import BaseAlgorithm
 import xgboost as xgb
 
@@ -11,10 +9,9 @@ class ExtremeGradientBoostingAlgorithm(BaseAlgorithm):
         self.parameters = parameters
 
     def fit(self):
-        print("Started fitting")
-
         self.x_train = self.scaler.fit_transform(self.x_train)
         self.x_test = self.scaler.transform(self.x_test)
+
         d_train = xgb.DMatrix(self.x_train, self.y_train)
         d_test = xgb.DMatrix(self.x_test, self.y_test)
 

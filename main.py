@@ -1,10 +1,21 @@
 import csv
 import pandas as pd
+<<<<<<< HEAD
 from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
+=======
+
+# from algorithms.neural_network import NeuralNetwork
+from algorithms.neural_network import NeuralNetwork
+from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
+    FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
+>>>>>>> main
 
 from random_forest import RandomForestRegressorAlgorithm
 
 from algorithms.factory import AlgorithmFactory
+
+
+# from algorithms.neural_network import NeuralNetwork
 
 class PlayerBasicStatistic:
     def __init__(self, playerCountry, avgNumberOfKils, avgNumberOfAssits, avgNumberOfDeath, avgMatchRating):
@@ -15,8 +26,11 @@ class PlayerBasicStatistic:
         self.avgMatchRating = avgMatchRating
 
     def __str__(self):
-        return "Player: " + self.playerCountry + "\nAverage kills: " + str(self.avgNumberOfKils) + "\nAverage assists: " + str(self.avgNumberOfAssits) + "\nAverage deaths: " + str(self.avgNumberOfDeath) + "\nAverage match 2.0 rating: " + str(self.avgMatchRating)
-    
+        return "Player: " + self.playerCountry + "\nAverage kills: " + str(
+            self.avgNumberOfKils) + "\nAverage assists: " + str(self.avgNumberOfAssits) + "\nAverage deaths: " + str(
+            self.avgNumberOfDeath) + "\nAverage match 2.0 rating: " + str(self.avgMatchRating)
+
+
 # Indeksi za pristup podacima vezanih za igraca
 # 1 - Naziv igraca, 2 - Tim, 3 - Protivnik, 4- Drzava, 9- broj mapa koje su igrane
 # 13 - Broj kilova igraca, 14 - Broj asistencija, 15 - Broj smrti, 22 - 2.0 rating u mecu
@@ -38,47 +52,50 @@ def readStatisticsForPlayer(playerName):
     with open('datasets/players.csv', newline='', encoding="utf8") as csvfile:
         players = csv.reader(csvfile, delimiter=',', quotechar='|')
         for playerData in players:
-            if playerData[1].lower()==playerName.lower():
-                #print(playerData[1] + '-' + playerData[4] +'-'+ playerData[13]+'-'+playerData[14]+'-'+playerData[15]+'-'+playerData[22])
-                numberOfRecords= numberOfRecords+1
-                playerCountry= playerData[4]
-                sumNumberOfKils= sumNumberOfKils + int(playerData[13])
-                sumNumberOfAssits= sumNumberOfAssits + int(playerData[14])
-                sumNumberOfDeath= sumNumberOfDeath + int(playerData[15])
-                sumMatchRating= sumMatchRating + float(playerData[22])
+            if playerData[1].lower() == playerName.lower():
+                # print(playerData[1] + '-' + playerData[4] +'-'+ playerData[13]+'-'+playerData[14]+'-'+playerData[15]+'-'+playerData[22])
+                numberOfRecords = numberOfRecords + 1
+                playerCountry = playerData[4]
+                sumNumberOfKils = sumNumberOfKils + int(playerData[13])
+                sumNumberOfAssits = sumNumberOfAssits + int(playerData[14])
+                sumNumberOfDeath = sumNumberOfDeath + int(playerData[15])
+                sumMatchRating = sumMatchRating + float(playerData[22])
 
-    return PlayerBasicStatistic(playerCountry, sumNumberOfKils/numberOfRecords, sumNumberOfAssits/numberOfRecords, sumNumberOfDeath/numberOfRecords, sumMatchRating/numberOfRecords)
+    return PlayerBasicStatistic(playerCountry, sumNumberOfKils / numberOfRecords, sumNumberOfAssits / numberOfRecords,
+                                sumNumberOfDeath / numberOfRecords, sumMatchRating / numberOfRecords)
+
 
 def main():
     data_set_processing()
 
-    #team1 = input('Unesi prvi tim: ')
-    #team2 = input('Unesi drugi tim: ')
-    #team1players = [] 
-    #team2players = [] 
+    # team1 = input('Unesi prvi tim: ')
+    # team2 = input('Unesi drugi tim: ')
+    # team1players = []
+    # team2players = []
 
-    #for i in range(1):
+    # for i in range(1):
     #    team1players.append(input(f'Unesi {i+1}. igraca iz ' + team1 +': '))
 
-    #for i in range(1):
+    # for i in range(1):
     #    team2players.append(input(f'Unesi {i+1}. igraca iz ' + team2 +': '))
 
-    #playerStatisticsFirstTeam = []
-    #playerStatisticsSecondTeam = []
+    # playerStatisticsFirstTeam = []
+    # playerStatisticsSecondTeam = []
 
-    #for playerName in team1players:
+    # for playerName in team1players:
     #    playerStatisticsFirstTeam.append(readStatisticsForPlayer(playerName))
 
-    #for playerName in team2players:
+    # for playerName in team2players:
     #    playerStatisticsSecondTeam.append(readStatisticsForPlayer(playerName))
 
-    #print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
-    #for playerWithStatistics in playerStatisticsFirstTeam:
+    # print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
+    # for playerWithStatistics in playerStatisticsFirstTeam:
     #    print(playerWithStatistics)
 
-    #print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
-    #for playerWithStatistics in playerStatisticsSecondTeam:
+    # print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
+    # for playerWithStatistics in playerStatisticsSecondTeam:
     #    print(playerWithStatistics)
+
 
 if __name__ == "__main__":
     # main()
@@ -86,6 +103,24 @@ if __name__ == "__main__":
     # convert_country_to_num()
     # convert_country_to_num()
     data_set_processing()
+    # rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')#.with_country()
+    # rfalg.load_data()
+    # rfalg.fit()
+    # rfalg.predict()
+    # merge_country_and_avg_rating()
+    # print(get_country_percentage_in_dataset(5))
+    # random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+    #                                             FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
+    # # False, True, False,
+    # #                                                                                                False, False)
+    # random_forest_alg.load_data()
+    # random_forest_alg.fit()
+    # random_forest_alg.predict()
+
+    nnetwork = NeuralNetwork(FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
+    nnetwork.load_data()
+    nnetwork.fit()
+    nnetwork.predict()
 
     # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
     # bst.train()
