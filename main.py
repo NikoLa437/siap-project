@@ -4,7 +4,7 @@ import pandas as pd
 # from algorithms.neural_network import NeuralNetwork
 #from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, average_rating_for_players_for_kmeans, data_set_processing, \
-    FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH
+    FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH, PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, PLAYERS_WITH_KMEANS_CLUSTER_PATH
 
 from random_forest import RandomForestRegressorAlgorithm
 from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
@@ -102,8 +102,15 @@ def testKMeans():
 
 
 if __name__ == "__main__":
-    #testKMeans()
-    # data_set_processing()
+    #average_rating_for_players_for_kmeans()
+
+    ##kmeans = KmeansAlgorithm(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH)
+    #kmeans.fit(7)
+    #kmeans.visualizing_results()
+    #kmeans.predict_and_save_to_file_player_clusters(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, PLAYERS_WITH_KMEANS_CLUSTER_PATH)
+    
+    data_set_processing()
+
     # average_ranking_for_players()
     # convert_country_to_num()
     # convert_country_to_num()
@@ -113,6 +120,10 @@ if __name__ == "__main__":
     # rfalg.predict()
     # merge_country_and_avg_rating()
     # print(get_country_percentage_in_dataset(5))
+
+    # use_players_country=False, use_avg_country_rating=False,
+    #                 use_commonness=False, use_players_country_percentage=False,
+    #                 use_avg_team_country_rating=False
     random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
                                                  FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH)#.with_country(use_commonness=True)
     # # False, True, False,

@@ -1,5 +1,6 @@
 import pandas as pd
 import csv
+import math
 
 RESULTS_DATASET_FILE_PATH = 'datasets/results.csv'
 PLAYERS_DATASET_FILE_PATH = 'datasets/players.csv'
@@ -15,6 +16,7 @@ FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
 PLAYERS_AVG_RATING_FILE_PATH= 'datasets/players_avg_rating.csv'
 PLAYER_WITH_COUNTRY_AVG_RATING = 'datasets/player_country_with_avg_rating.csv'
 PLAYERS_AVG_K_MEANS_DATA_FILE_PATH= 'datasets/players_avg_kmeans_data.csv'
+PLAYERS_WITH_KMEANS_CLUSTER_PATH= 'datasets/players_kmeans_cluster.csv'
 
 def save_dict_to_csv_file(data, file, header):
     try:
@@ -175,8 +177,9 @@ def data_set_processing():
 
 def average_rating_for_players_for_kmeans():
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
-    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills','assists','deaths','hs', 'rating'].mean()
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills', 'assists', 'deaths', 'hs', 'rating', 'kast', 'kddiff', 'adr'].mean()
     dictsArray = []
+    print('DOSAO OVDE')
 
     for item in avg_players_rating.values:
         dicts = {}
@@ -186,7 +189,22 @@ def average_rating_for_players_for_kmeans():
         dicts['assists'] = item[2]
         dicts['deaths'] = item[3]
         dicts['hs'] = item[4]
-        dicts['rating'] = item[5]
+        dicts['rating'] = item[5] 
+        valueForKast= item[6]
+        if math.isnan(item[6]):
+            valueForKast= players_matches['kast'].mean()
+        dicts['kast'] = valueForKast
+
+        valueForKDiff=item[7]
+        if math.isnan(item[7]):
+            valueForKDiff=players_matches['kddiff'].mean()
+        dicts['kddiff'] = valueForKDiff
+
+        valueForAdr=item[8]
+        if math.isnan(item[8]):
+            valueForAdr=players_matches['adr'].mean()
+
+        dicts['adr'] = valueForAdr
 
         dictsArray.append(dicts)
 
@@ -195,6 +213,6 @@ def average_rating_for_players_for_kmeans():
     df.to_csv(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, index = False, header=True)
 
 def get_players_cluster():
-    player_cluster = pd.read_csv('datasets/players_kmeans_cluster.csv', index_col=0,  encoding='utf-8').to_dict()
+    player_cluster = pd.read_csv(PLAYERS_WITH_KMEANS_CLUSTER_PATH, index_col=0,  encoding='utf-8').to_dict()
 
     return player_cluster['cluster']

@@ -54,4 +54,5 @@ class AlgorithmFactory:
     switcher = {
         "XG_BOOST_REGRESSOR": create_extreme_gradient_boosting_regressor.__func__,
         "RANDOM_FOREST_REGRESSOR": create_random_forest_regressor.__func__,
+        "NEURAL_NETWORK": create_naural_network.__func__,
     }

@@ -71,7 +71,7 @@ class KmeansAlgorithm:
         players_avg_kmeans_data = pd.read_csv(players_kmeans_file,  encoding='utf-8')
 
         scaled_features = players_avg_kmeans_data.copy()
-        col_names = ['kills', 'assists', 'deaths', 'hs', 'rating']
+        col_names = ['kills', 'assists', 'deaths', 'hs', 'rating', 'kast', 'kddiff', 'adr']
         features = scaled_features[col_names]
 
         scaler = StandardScaler().fit(features.values)
@@ -84,11 +84,9 @@ class KmeansAlgorithm:
             player_dict={}
 
             player_dict['player_name']=row['player_name']
-           
-            player_data = [float(row['kills']),float(row['assists']),float(row['deaths']),float(row['hs']),float(row['rating'])]
-            
+                       
             print(i)
-            player_dict['cluster']= self.kmeans.predict([[float(row['kills']),float(row['assists']),float(row['deaths']),float(row['hs']),float(row['rating'])]])[0]
+            player_dict['cluster']= self.kmeans.predict([[float(row['kills']),float(row['assists']),float(row['deaths']),float(row['hs']),float(row['rating']),float(row['kast']),float(row['kddiff']),float(row['adr'])]])[0]
 
             dictsArray.append(player_dict)
 
