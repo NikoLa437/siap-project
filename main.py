@@ -1,13 +1,16 @@
 import csv
 import pandas as pd
+<<<<<<< HEAD
+from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
+=======
 
 # from algorithms.neural_network import NeuralNetwork
 from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
     FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
+>>>>>>> main
 
 from random_forest import RandomForestRegressorAlgorithm
-from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 
 from algorithms.factory import AlgorithmFactory
 
@@ -64,7 +67,6 @@ def readStatisticsForPlayer(playerName):
 
 def main():
     data_set_processing()
-    print('prosao')
 
     # team1 = input('Unesi prvi tim: ')
     # team2 = input('Unesi drugi tim: ')
@@ -100,6 +102,7 @@ if __name__ == "__main__":
     # average_ranking_for_players()
     # convert_country_to_num()
     # convert_country_to_num()
+    data_set_processing()
     # rfalg = RandomForestRegressorAlgorithm('datasets/final.csv')#.with_country()
     # rfalg.load_data()
     # rfalg.fit()
@@ -122,3 +125,14 @@ if __name__ == "__main__":
     # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
     # bst.train()
     # bst.predict()
+
+    extreme_gradient_boosting_alg = AlgorithmFactory.create("XG_BOOST_REGRESSOR", FINAL_DATASET_CUSTOM_RATING_FILE_PATH).with_custom_rating()
+    extreme_gradient_boosting_alg.load_data()
+    extreme_gradient_boosting_alg.fit()
+    extreme_gradient_boosting_alg.predict()
+
+    # random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[0], FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country()
+    # random_forest_alg.load_data()
+    # random_forest_alg.fit()
+    # random_forest_alg.predict()
+
