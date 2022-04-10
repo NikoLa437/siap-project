@@ -1,15 +1,11 @@
 import csv
 import pandas as pd
-<<<<<<< HEAD
 from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
-=======
 
 # from algorithms.neural_network import NeuralNetwork
 from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
     FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
->>>>>>> main
-
 from random_forest import RandomForestRegressorAlgorithm
 
 from algorithms.factory import AlgorithmFactory
