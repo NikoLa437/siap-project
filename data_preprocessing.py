@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 import csv
 
@@ -11,7 +13,9 @@ COUTRY_TO_NUM_FILE_PATH= 'datasets/country_to_num.csv'
 PLAYERS_WITH_COUNTRIES_FILE_PATH= 'datasets/player_with_country.csv'
 FINAL_DATASET_FILE_PATH= 'datasets/final.csv'
 FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
+FINAL_DATASET_CUSTOM_RATING_FILE_PATH= 'datasets/final_custom_rating.csv'
 PLAYERS_AVG_RATING_FILE_PATH= 'datasets/players_avg_rating.csv'
+PLAYERS_AVG_CUSTOM_RATING_FILE_PATH= 'datasets/players_avg_custom_rating.csv'
 PLAYER_WITH_COUNTRY_AVG_RATING = 'datasets/player_country_with_avg_rating.csv'
 
 
@@ -54,7 +58,6 @@ def convert_country_to_num():
     for index, row in X.iterrows():
         player_with_country[row['player_name']] = country_to_num[row['country']]
 
-    print(player_with_country)
     save_dict_to_csv_file(country_to_num, COUTRY_TO_NUM_FILE_PATH, ['country', 'country_number'])
     save_dict_to_csv_file(player_with_country, PLAYERS_WITH_COUNTRIES_FILE_PATH, ['player_name', 'country_number'])
 
@@ -90,6 +93,25 @@ def convert_map_to_num():
 
     return map_to_num;
 
+def calculateCustomRanking(kast, kills, deaths, assists, adr, numberOfRoundsInMatch, hs, fkdiff):
+    if math.isnan(kast):
+        kast = 0
+    if math.isnan(kills):
+        kills = 0
+    if math.isnan(deaths):
+        deaths = 0
+    if math.isnan(assists):
+        assists = 0
+    if math.isnan(adr):
+        adr = 0
+    if math.isnan(hs):
+        adr = 0
+    if math.isnan(fkdiff):
+        adr = 0
+    impact = 2.13 * kills / numberOfRoundsInMatch + 0.42 * assists / numberOfRoundsInMatch - 0.41
+    custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch + 0.08 * hs + 0.05 * fkdiff - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+    return custom_rating
+
 def data_set_processing():
     df = pd.read_csv(RESULTS_DATASET_FILE_PATH,  encoding='utf-8')
     dfPlayers = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
@@ -103,10 +125,12 @@ def data_set_processing():
     grouped_by_match_id= df.groupby(['match_id'])
     dicts_array = []
 
+    avg_custom_rating = {}
+    rating_counter = {}
     for group_name, df_group in grouped_by_match_id:
         dicts = {}
         number_of_map=1
-
+        numberOfRoundsInMatch = 0
         # iterate through maps 
         for row_index, row in df_group.iterrows():
             dicts['match_id'] = row["match_id"]
@@ -118,7 +142,10 @@ def data_set_processing():
             dicts['map_' + str(number_of_map) +'_winner'] = row["map_winner"]
             dicts['match_winner'] = row["match_winner"]
             number_of_map=number_of_map+1
-        
+
+            numberOfRoundsInMatch += row["result_1"]
+            numberOfRoundsInMatch += row["result_2"]
+
         # dataframe of players on this match
         dfLists = dfPlayers.loc[dfPlayers['match_id']== group_name].groupby(['match_id'])
 
@@ -138,43 +165,37 @@ def data_set_processing():
 
                 if(team_to_num[row['team']]==dicts['team_1']): # is this player in team1
                     dicts['player_' + str(team1num) + '_team_1_name'] = row['player_name']
-                    dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
                     dicts['player_' + str(team1num) + '_team_1'] = player_to_num[row['player_name']]
                     dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
-                    dicts['player_' + str(team1num) + '_team_1_kills'] = row['kills']
-                    dicts['player_' + str(team1num) + '_team_1_assists'] = row['assists']
-                    dicts['player_' + str(team1num) + '_team_1_deaths'] = row['deaths']
-                    dicts['player_' + str(team1num) + '_team_1_hs'] = row['hs']
-                    dicts['player_' + str(team1num) + '_team_1_kast'] = row['kast']
-                    dicts['player_' + str(team1num) + '_team_1_kddiff'] = row['kddiff']
-                    dicts['player_' + str(team1num) + '_team_1_adr'] = row['adr']
-                    dicts['player_' + str(team1num) + '_team_1_fkdiff'] = row['fkdiff']
-                    # 0.0073*KAST + 0.3591*KPR + -0.5329*DPR + 0.2372*Impact + 0.0032*ADR + 0.1587 ≈ Rating 2.0
-                    custom_rating = -0.5 * row['deaths'] + 0.35 * row['kills'] + 0.1 * row['assists'] + 0.003 * 25 * row['adr'] + 0.007 * row['kast'] + 0.05 * row['hs'] + 0.1 * row['fkdiff']
+                    dicts['player_' + str(team1num) + '_team_1_rating'] = row['rating']
+                    custom_rating = calculateCustomRanking(row['kast'], row['kills'], row['deaths'], row['assists'], row['adr'], numberOfRoundsInMatch, row['hs'], row['fkdiff'])
                     dicts['player_' + str(team1num) + '_team_1_custom_rating'] = custom_rating
                     #dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
                     #dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
-
                     team1num=team1num+1 # increase team1 players
+                    if row['player_name'] in avg_custom_rating:
+                        avg_custom_rating[row['player_name']] += custom_rating
+                        rating_counter[row['player_name']] += 1
+                    else:
+                        avg_custom_rating[row['player_name']] = custom_rating
+                        rating_counter[row['player_name']] = 1
+
                 else: #  this player is in team1
                     dicts['player_' + str(team2num) + '_team_2_name'] = row['player_name']
-                    dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
                     dicts['player_' + str(team2num) + '_team_2'] = player_to_num[row['player_name']]
                     dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
-                    dicts['player_' + str(team2num) + '_team_2_kills'] = row['kills']
-                    dicts['player_' + str(team2num) + '_team_2_assists'] = row['assists']
-                    dicts['player_' + str(team2num) + '_team_2_deaths'] = row['deaths']
-                    dicts['player_' + str(team2num) + '_team_2_hs'] = row['hs']
-                    dicts['player_' + str(team2num) + '_team_2_kast'] = row['kast']
-                    dicts['player_' + str(team2num) + '_team_2_kddiff'] = row['kddiff']
-                    dicts['player_' + str(team2num) + '_team_2_adr'] = row['adr']
-                    dicts['player_' + str(team2num) + '_team_2_fkdiff'] = row['fkdiff']
-                    custom_rating = -0.5 * row['deaths'] + 0.35 * row['kills'] + 0.1 * row['assists'] + 0.003 * 25 * row['adr'] + 0.007 * row['kast'] + 0.05 * row['hs'] + 0.1 * row['fkdiff']
+                    dicts['player_' + str(team2num) + '_team_2_rating'] = row['rating']
+                    custom_rating = calculateCustomRanking(row['kast'], row['kills'], row['deaths'], row['assists'], row['adr'], numberOfRoundsInMatch, row['hs'], row['fkdiff'])
                     dicts['player_' + str(team2num) + '_team_2_custom_rating'] = custom_rating
                     #dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
                     #dicts['player_' + str(team1num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
-
                     team2num=team2num+1  # increase team1 players
+                    if row['player_name'] in avg_custom_rating:
+                        avg_custom_rating[row['player_name']] += custom_rating
+                        rating_counter[row['player_name']] += 1
+                    else:
+                        avg_custom_rating[row['player_name']] = custom_rating
+                        rating_counter[row['player_name']] = 1
 
             if(hasPlayers==False): # if we haven't valid player data skip this match
                 break;
@@ -187,5 +208,9 @@ def data_set_processing():
         if(hasPlayers): # if we have valid data, add data to array
             dicts_array.append(dicts)
 
+    for player in avg_custom_rating.keys():
+        avg_custom_rating[player] = avg_custom_rating[player] / rating_counter[player]
+    save_dict_to_csv_file(avg_custom_rating, PLAYERS_AVG_CUSTOM_RATING_FILE_PATH, ['player_name', 'avg_rating'])
+
     df = pd.DataFrame.from_dict(dicts_array) 
-    df.to_csv (FINAL_DATASET_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_CUSTOM_RATING_FILE_PATH, index = False, header=True)

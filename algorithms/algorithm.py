@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from data_preprocessing import PLAYERS_AVG_RATING_FILE_PATH
+from data_preprocessing import PLAYERS_AVG_RATING_FILE_PATH, PLAYERS_AVG_CUSTOM_RATING_FILE_PATH
 import numpy as np
 
 NUMBER_OF_TEAMS = 2
@@ -24,9 +24,14 @@ class BaseAlgorithm(ABC):
         self.path_to_data = path_to_data
         self.scaler = StandardScaler()
         self.use_country_data = False
+        self.use_custom_rating = False
 
     def with_country(self):
         self.use_country_data = True
+        return self
+
+    def with_custom_rating(self):
+        self.use_custom_rating = True
         return self
 
     def load_data(self):
@@ -67,7 +72,12 @@ class BaseAlgorithm(ABC):
 
         for t_idx in range(1, NUMBER_OF_TEAMS + 1):
             for p_idx in range(1, PLAYERS_PER_TEAM + 1):
-                data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
+
+                if self.use_custom_rating:
+                    data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
+                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_custom_rating"}']]
+                else:
+                    data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
                                      match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}']]
 
                 if self.use_country_data:
@@ -75,6 +85,8 @@ class BaseAlgorithm(ABC):
                                      match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_country_rating"}']]
 
                 player_names += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_name"}']]
+
+
 
         return country_commonness + data_of_interest + player_names + country_data
 
@@ -119,7 +131,10 @@ class BaseAlgorithm(ABC):
         self.x_train = new_x_train
 
     def replace_test_input_rating_with_avg(self):
-        players_ratings = pd.read_csv(PLAYERS_AVG_RATING_FILE_PATH, delimiter=',', encoding="utf8")
+        if self.use_custom_rating:
+            players_ratings = pd.read_csv(PLAYERS_AVG_CUSTOM_RATING_FILE_PATH, delimiter=',', encoding="utf8")
+        else:
+            players_ratings = pd.read_csv(PLAYERS_AVG_RATING_FILE_PATH, delimiter=',', encoding="utf8")
         ratings_dict = dict(players_ratings.values)
         for row in self.x_test:
             row[6] = ratings_dict[row[-10 if not self.use_country_data else -30]]
