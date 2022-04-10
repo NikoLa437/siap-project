@@ -1,19 +1,19 @@
 import csv
 import pandas as pd
-from data_preprocessing import data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, average_k_means_data_for_players
 
-#from random_forest import RandomForestRegressorAlgorithm
-#from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
+# from algorithms.neural_network import NeuralNetwork
+#from algorithms.neural_network import NeuralNetwork
+from data_preprocessing import get_country_percentage_in_dataset, average_rating_for_players_for_kmeans, data_set_processing, \
+    FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH
 
-#from algorithms.factory import AlgorithmFactory
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-import numpy as np
-from sklearn.model_selection import ParameterGrid
-from sklearn.cluster import KMeans
-from sklearn import metrics
-import matplotlib.pyplot as plt
+from random_forest import RandomForestRegressorAlgorithm
+from extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 
+from algorithms.factory import AlgorithmFactory
+from algorithms.kmeans import KmeansAlgorithm
+
+
+# from algorithms.neural_network import NeuralNetwork
 
 class PlayerBasicStatistic:
     def __init__(self, playerCountry, avgNumberOfKils, avgNumberOfAssits, avgNumberOfDeath, avgMatchRating):
@@ -24,8 +24,11 @@ class PlayerBasicStatistic:
         self.avgMatchRating = avgMatchRating
 
     def __str__(self):
-        return "Player: " + self.playerCountry + "\nAverage kills: " + str(self.avgNumberOfKils) + "\nAverage assists: " + str(self.avgNumberOfAssits) + "\nAverage deaths: " + str(self.avgNumberOfDeath) + "\nAverage match 2.0 rating: " + str(self.avgMatchRating)
-    
+        return "Player: " + self.playerCountry + "\nAverage kills: " + str(
+            self.avgNumberOfKils) + "\nAverage assists: " + str(self.avgNumberOfAssits) + "\nAverage deaths: " + str(
+            self.avgNumberOfDeath) + "\nAverage match 2.0 rating: " + str(self.avgMatchRating)
+
+
 # Indeksi za pristup podacima vezanih za igraca
 # 1 - Naziv igraca, 2 - Tim, 3 - Protivnik, 4- Drzava, 9- broj mapa koje su igrane
 # 13 - Broj kilova igraca, 14 - Broj asistencija, 15 - Broj smrti, 22 - 2.0 rating u mecu
@@ -47,149 +50,60 @@ def readStatisticsForPlayer(playerName):
     with open('datasets/players.csv', newline='', encoding="utf8") as csvfile:
         players = csv.reader(csvfile, delimiter=',', quotechar='|')
         for playerData in players:
-            if playerData[1].lower()==playerName.lower():
-                #print(playerData[1] + '-' + playerData[4] +'-'+ playerData[13]+'-'+playerData[14]+'-'+playerData[15]+'-'+playerData[22])
-                numberOfRecords= numberOfRecords+1
-                playerCountry= playerData[4]
-                sumNumberOfKils= sumNumberOfKils + int(playerData[13])
-                sumNumberOfAssits= sumNumberOfAssits + int(playerData[14])
-                sumNumberOfDeath= sumNumberOfDeath + int(playerData[15])
-                sumMatchRating= sumMatchRating + float(playerData[22])
+            if playerData[1].lower() == playerName.lower():
+                # print(playerData[1] + '-' + playerData[4] +'-'+ playerData[13]+'-'+playerData[14]+'-'+playerData[15]+'-'+playerData[22])
+                numberOfRecords = numberOfRecords + 1
+                playerCountry = playerData[4]
+                sumNumberOfKils = sumNumberOfKils + int(playerData[13])
+                sumNumberOfAssits = sumNumberOfAssits + int(playerData[14])
+                sumNumberOfDeath = sumNumberOfDeath + int(playerData[15])
+                sumMatchRating = sumMatchRating + float(playerData[22])
 
-    return PlayerBasicStatistic(playerCountry, sumNumberOfKils/numberOfRecords, sumNumberOfAssits/numberOfRecords, sumNumberOfDeath/numberOfRecords, sumMatchRating/numberOfRecords)
+    return PlayerBasicStatistic(playerCountry, sumNumberOfKils / numberOfRecords, sumNumberOfAssits / numberOfRecords,
+                                sumNumberOfDeath / numberOfRecords, sumMatchRating / numberOfRecords)
 
-PLAYERS_AVG_K_MEANS_DATA_FILE_PATH= 'datasets/players_avg_kmeans_data.csv'
 
+def testKMeans():
+    print('test')
+    
+    #average_rating_for_players_for_kmeans()
 
-def load_data():
-    kmeans_data = pd.read_csv(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH)
+    #kmeans = KmeansAlgorithm('datasets/players_avg_kmeans_data.csv')
+    #kmeans.fit(5)
+    #kmeans.visualizing_results()
+    #kmeans.predict_and_save_to_file_player_clusters('datasets/players_avg_kmeans_data.csv','datasets/players_kmeans_cluster.csv')
+    # team1 = input('Unesi prvi tim: ')
+    # team2 = input('Unesi drugi tim: ')
+    # team1players = []
+    # team2players = []
 
-    kmeans_data[kmeans_data.columns] = StandardScaler().fit_transform(kmeans_data)
-
-    return kmeans_data
-
-def pca_embeddings(df_scaled):
-    """To reduce the dimensions of the wine dataset we use Principal Component Analysis (PCA).
-    Here we reduce it from 13 dimensions to 2.
-    :param df_scaled: scaled data
-    :return: pca result, pca for plotting graph
-    """
-
-    pca_2 = PCA(n_components=2)
-    pca_2_result = pca_2.fit_transform(df_scaled)
-    print('Explained variation per principal component: {}'.format(pca_2.explained_variance_ratio_))
-    print('Cumulative variance explained by 2 principal components: {:.2%}'.format(
-        np.sum(pca_2.explained_variance_ratio_)))
-    return pca_2_result, pca_2
-
-def kmean_hyper_param_tuning(data):
-    """
-    Hyper parameter tuning to select the best from all the parameters on the basis of silhouette_score.
-    :param data: dimensionality reduced data after applying PCA
-    :return: best number of clusters for the model (used for KMeans n_clusters)
-    """
-    # candidate values for our number of cluster
-    parameters = [2, 3, 4, 5,6,7,8,9, 10]
-
-    # instantiating ParameterGrid, pass number of clusters as input
-    parameter_grid = ParameterGrid({'n_clusters': parameters})
-
-    best_score = -1
-    kmeans_model = KMeans()     # instantiating KMeans model
-    silhouette_scores = []
-
-    # evaluation based on silhouette_score
-    for p in parameter_grid:
-        kmeans_model.set_params(**p)    # set current hyper parameter
-        kmeans_model.fit(data)          # fit model on wine dataset, this will find clusters based on parameter p
-
-        ss = metrics.silhouette_score(data, kmeans_model.labels_)   # calculate silhouette_score
-        silhouette_scores += [ss]       # store all the scores
-
-        print('Parameter:', p, 'Score', ss)
-
-        # check p which has the best score
-        if ss > best_score:
-            best_score = ss
-            best_grid = p
-
-    # plotting silhouette score
-    plt.bar(range(len(silhouette_scores)), list(silhouette_scores), align='center', color='#722f59', width=0.5)
-    plt.xticks(range(len(silhouette_scores)), list(parameters))
-    plt.title('Silhouette Score', fontweight='bold')
-    plt.xlabel('Number of Clusters')
-    plt.show()
-
-    return best_grid['n_clusters']
-
-def visualizing_results(pca_result, label, centroids_pca):
-    """ Visualizing the clusters
-    :param pca_result: PCA applied data
-    :param label: K Means labels
-    :param centroids_pca: PCA format K Means centroids
-    """
-    # ------------------ Using Matplotlib for plotting-----------------------
-    x = pca_result[:, 0]
-    y = pca_result[:, 1]
-
-    plt.scatter(x, y, c=label, alpha=0.5, s= 200)  # plot different colors per cluster
-    plt.title('Player clusters')
-    plt.xlabel('PCA 1')
-    plt.ylabel('PCA 2')
-
-    plt.scatter(centroids_pca[:, 0], centroids_pca[:, 1], marker='X', s=200, linewidths=1.5,
-                color='red', edgecolors="black", lw=1.5)
-
-    plt.show()
-
-def main():
-    #data_set_processing()
-    #average_k_means_data_for_players()
-    scaled_data = load_data()
-    pca_result, pca_2 = pca_embeddings(scaled_data)
-    #optimum_num_clusters = kmean_hyper_param_tuning(scaled_data)
-    #print("optimum num of clusters =", optimum_num_clusters)
-    #print('prosao')
-
-    kmeans = KMeans(n_clusters=5)
-    kmeans.fit(scaled_data)
-    centroids = kmeans.cluster_centers_
-    centroids_pca = pca_2.transform(centroids)
-
-    print(kmeans.cluster_centers_)
-
-    print("4. Visualizing the data")
-    visualizing_results(pca_result, kmeans.labels_, centroids_pca)
-    #team1 = input('Unesi prvi tim: ')
-    #team2 = input('Unesi drugi tim: ')
-    #team1players = [] 
-    #team2players = [] 
-
-    #for i in range(1):
+    # for i in range(1):
     #    team1players.append(input(f'Unesi {i+1}. igraca iz ' + team1 +': '))
 
-    #for i in range(1):
+    # for i in range(1):
     #    team2players.append(input(f'Unesi {i+1}. igraca iz ' + team2 +': '))
 
-    #playerStatisticsFirstTeam = []
-    #playerStatisticsSecondTeam = []
+    # playerStatisticsFirstTeam = []
+    # playerStatisticsSecondTeam = []
 
-    #for playerName in team1players:
+    # for playerName in team1players:
     #    playerStatisticsFirstTeam.append(readStatisticsForPlayer(playerName))
 
-    #for playerName in team2players:
+    # for playerName in team2players:
     #    playerStatisticsSecondTeam.append(readStatisticsForPlayer(playerName))
 
-    #print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
-    #for playerWithStatistics in playerStatisticsFirstTeam:
+    # print('Za tim: ' + team1 + ' igraju sledeci igraci sa statistikama: \n')
+    # for playerWithStatistics in playerStatisticsFirstTeam:
     #    print(playerWithStatistics)
 
-    #print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
-    #for playerWithStatistics in playerStatisticsSecondTeam:
+    # print('Za tim: ' + team2 + ' igraju sledeci igraci sa statistikama: \n')
+    # for playerWithStatistics in playerStatisticsSecondTeam:
     #    print(playerWithStatistics)
+
 
 if __name__ == "__main__":
-    main()
+    #testKMeans()
+    # data_set_processing()
     # average_ranking_for_players()
     # convert_country_to_num()
     # convert_country_to_num()
@@ -197,11 +111,21 @@ if __name__ == "__main__":
     # rfalg.load_data()
     # rfalg.fit()
     # rfalg.predict()
+    # merge_country_and_avg_rating()
+    # print(get_country_percentage_in_dataset(5))
+    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+                                                 FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH)#.with_country(use_commonness=True)
+    # # False, True, False,
+    # #                                                                                                False, False)
+    random_forest_alg.load_data()
+    random_forest_alg.fit()
+    random_forest_alg.predict()
 
-    #random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[0], FINAL_DATASET_FILE_PATH)#.with_country()
-    #random_forest_alg.load_data()
-    #random_forest_alg.fit()
-    #random_forest_alg.predict()
+    #ove 4 sam zakomentarisao
+    #nnetwork = NeuralNetwork(FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
+    #nnetwork.load_data()
+    #nnetwork.fit()
+    #nnetwork.predict()
 
     # bst = ExtremeGradientBoostingAlgorithm('datasets/final.csv')
     # bst.train()

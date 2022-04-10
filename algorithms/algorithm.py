@@ -5,14 +5,11 @@ import pandas as pd
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+from algorithms.const import NUMBER_OF_TEAMS, PLAYERS_PER_TEAM, RANDOM_STATE, MAPS_PER_GAME, COUNTRY_SUFFIX
 from data_preprocessing import PLAYERS_AVG_RATING_FILE_PATH
+from algorithms.country_info_provider import CountryInfoProvider
 import numpy as np
-
-NUMBER_OF_TEAMS = 2
-PLAYERS_PER_TEAM = 5
-MAPS_PER_GAME = 3
-
-RANDOM_STATE = 42
 
 
 class BaseAlgorithm(ABC):
@@ -21,9 +18,17 @@ class BaseAlgorithm(ABC):
         self.path_to_data = path_to_data
         self.scaler = StandardScaler()
         self.use_country_data = False
+        self.country_info_provider = None
 
-    def with_country(self):
-        self.use_country_data = True
+    def with_country(self, use_players_country=False, use_avg_country_rating=False,
+                     use_commonness=False, use_players_country_percentage=False,
+                     use_avg_team_country_rating=False):
+        if use_players_country == True or use_avg_country_rating == True or use_players_country_percentage == True:
+            self.use_country_data = True
+
+        self.country_info_provider = CountryInfoProvider(use_players_country, use_avg_country_rating,
+                                                             use_commonness, use_players_country_percentage,
+                                                             use_avg_team_country_rating)
         return self
 
     def load_data(self):
@@ -58,17 +63,35 @@ class BaseAlgorithm(ABC):
         data_of_interest = []
         player_names = []
         country_data = []
+        country_commonness = []
+        avg_country_rating = []
+
+        if self.country_info_provider is not None:
+            if self.country_info_provider.use_commonness:
+               country_commonness += self.country_info_provider.get_commonness_of_team_country(match_data)
+            if self.country_info_provider.use_avg_team_country_rating:
+                avg_country_rating += self.country_info_provider.get_avg_team_country_rating(match_data)
+
         for t_idx in range(1, NUMBER_OF_TEAMS + 1):
             for p_idx in range(1, PLAYERS_PER_TEAM + 1):
                 data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
-                                     match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}']]
+                                     match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}'],
+                                     match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_kmeans_cluster"}']]
 
                 if self.use_country_data:
-                    country_data += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_country"}']]
+                    if self.country_info_provider.use_players_country:
+                        country_data += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_country"}']]
+                    if self.country_info_provider.use_avg_country_rating:
+                        country_data += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_country_rating"}']]
+                    if self.country_info_provider.use_players_country_percentage:
+                        country_data += [self.country_info_provider.get_country_percentage_in_dataset(
+                            match_data[
+                                f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_country"}'])]
 
                 player_names += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_name"}']]
 
-        return data_of_interest + player_names + country_data
+        self.country_features = len(country_data) / 10
+        return country_commonness + avg_country_rating + data_of_interest + player_names + country_data
 
     def predict(self):
         print("Started prediction")
@@ -76,7 +99,8 @@ class BaseAlgorithm(ABC):
         y_pred = self.round_predictions(y_pred)
         print("Accuracy: ", metrics.accuracy_score(self.y_test, y_pred))
 
-    def round_predictions(self, y_pred):
+    @staticmethod
+    def round_predictions(y_pred):
         return list(map(lambda a: 1 if abs(1 - a) < abs(0 - a) else 0, y_pred))
 
     @abstractmethod
@@ -87,10 +111,20 @@ class BaseAlgorithm(ABC):
         new_x_test = []
         new_x_train = []
         for index, val in enumerate(self.x_test):
-            new_x_test.append(val[0:-10 if not self.use_country_data else -20])
+            if self.use_country_data:
+                a = np.concatenate((val[:int(-1 * (self.country_features * 10) - NUMBER_OF_TEAMS * PLAYERS_PER_TEAM)],
+                                    val[-1 * NUMBER_OF_TEAMS * PLAYERS_PER_TEAM:]), axis=0)
+                new_x_test.append(a)
+            else:
+                new_x_test.append(val[:-1 * NUMBER_OF_TEAMS * PLAYERS_PER_TEAM])
 
         for index, val in enumerate(self.x_train):
-            new_x_train.append(val[0:-10 if not self.use_country_data else -20])
+            if self.use_country_data:
+                a = np.concatenate((val[:int(-1 * (self.country_features * 10) - NUMBER_OF_TEAMS * PLAYERS_PER_TEAM)],
+                                    val[-1 * NUMBER_OF_TEAMS * PLAYERS_PER_TEAM:]), axis=0)
+                new_x_train.append(a)
+            else:
+                new_x_train.append(val[:-1 * NUMBER_OF_TEAMS * PLAYERS_PER_TEAM])
 
         self.x_test = new_x_test
         self.x_train = new_x_train
@@ -98,14 +132,23 @@ class BaseAlgorithm(ABC):
     def replace_test_input_rating_with_avg(self):
         players_ratings = pd.read_csv(PLAYERS_AVG_RATING_FILE_PATH, delimiter=',', encoding="utf8")
         ratings_dict = dict(players_ratings.values)
+        country_features_ofset = int(-1 * ((self.country_features + 1) * 10))
+        rating_offset = 0
+        if self.country_info_provider is not None:
+            if self.country_info_provider.use_commonness:
+                rating_offset += 2
+            if self.country_info_provider.use_avg_team_country_rating:
+                rating_offset += 2
+
+        print(rating_offset, country_features_ofset)
         for row in self.x_test:
-            row[6] = ratings_dict[row[-10 if not self.use_country_data else -20]]
-            row[8] = ratings_dict[row[-9 if not self.use_country_data else -19]]
-            row[10] = ratings_dict[row[-8 if not self.use_country_data else -18]]
-            row[12] = ratings_dict[row[-7 if not self.use_country_data else -17]]
-            row[14] = ratings_dict[row[-6 if not self.use_country_data else -16]]
-            row[16] = ratings_dict[row[-5 if not self.use_country_data else -15]]
-            row[18] = ratings_dict[row[-4 if not self.use_country_data else -14]]
-            row[20] = ratings_dict[row[-3 if not self.use_country_data else -13]]
-            row[22] = ratings_dict[row[-2 if not self.use_country_data else -12]]
-            row[24] = ratings_dict[row[-1 if not self.use_country_data else -11]]
+            row[6 + rating_offset] = ratings_dict[row[-10 if not self.use_country_data else country_features_ofset]]
+            row[9 + rating_offset] = ratings_dict[row[-9 if not self.use_country_data else country_features_ofset + 1]]
+            row[12 + rating_offset] = ratings_dict[row[-8 if not self.use_country_data else country_features_ofset + 2]]
+            row[15 + rating_offset] = ratings_dict[row[-7 if not self.use_country_data else country_features_ofset + 3]]
+            row[18 + rating_offset] = ratings_dict[row[-6 if not self.use_country_data else country_features_ofset + 4]]
+            row[21 + rating_offset] = ratings_dict[row[-5 if not self.use_country_data else country_features_ofset + 5]]
+            row[24 + rating_offset] = ratings_dict[row[-4 if not self.use_country_data else country_features_ofset + 6]]
+            row[27 + rating_offset] = ratings_dict[row[-3 if not self.use_country_data else country_features_ofset + 7]]
+            row[30 + rating_offset] = ratings_dict[row[-2 if not self.use_country_data else country_features_ofset + 8]]
+            row[33 + rating_offset] = ratings_dict[row[-1 if not self.use_country_data else country_features_ofset + 9]]

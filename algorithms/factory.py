@@ -1,5 +1,6 @@
 from algorithms.extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 from algorithms.random_forest import RandomForestRegressorAlgorithm
+from algorithms.neural_network import NeuralNetwork
 
 
 class AlgorithmFactory:
@@ -19,7 +20,7 @@ class AlgorithmFactory:
                 'eta': 1,
                 'objective': 'binary:logistic',
                 'nthread': 4,
-                'eval_metric': 'auc'
+                'eval_metric': 'logloss'
             },
             'num_round': 10,
             'early_stopping_rounds': 10,
@@ -40,6 +41,10 @@ class AlgorithmFactory:
         }
 
         return RandomForestRegressorAlgorithm(data_path_or_data, parameters)
+
+    @staticmethod
+    def create_naural_network(data_path_or_data):
+        return NeuralNetwork(data_path_or_data)
 
     @staticmethod
     def get_algorithm_names():

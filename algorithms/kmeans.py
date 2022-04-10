@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import csv
 import pandas as pd
 
+
 class KmeansAlgorithm:
     def __init__(self, path_to_data):
         self.path_to_data = path_to_data
