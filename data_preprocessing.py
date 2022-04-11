@@ -2,6 +2,7 @@ import math
 
 import pandas as pd
 import csv
+import math
 
 RESULTS_DATASET_FILE_PATH = 'datasets/results.csv'
 PLAYERS_DATASET_FILE_PATH = 'datasets/players.csv'
@@ -12,12 +13,14 @@ MAPS_TO_NUM_FILE_PATH = 'datasets/map_to_num.csv'
 COUTRY_TO_NUM_FILE_PATH= 'datasets/country_to_num.csv'
 PLAYERS_WITH_COUNTRIES_FILE_PATH= 'datasets/player_with_country.csv'
 FINAL_DATASET_FILE_PATH= 'datasets/final.csv'
+FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH= 'datasets/final-with-clusters.csv'
 FINAL_DATASET_WITH_COUNTRY_FILE_PATH= 'datasets/final_with_country.csv'
 FINAL_DATASET_CUSTOM_RATING_FILE_PATH= 'datasets/final_custom_rating.csv'
 PLAYERS_AVG_RATING_FILE_PATH= 'datasets/players_avg_rating.csv'
 PLAYERS_AVG_CUSTOM_RATING_FILE_PATH= 'datasets/players_avg_custom_rating.csv'
 PLAYER_WITH_COUNTRY_AVG_RATING = 'datasets/player_country_with_avg_rating.csv'
-
+PLAYERS_AVG_K_MEANS_DATA_FILE_PATH= 'datasets/players_avg_kmeans_data.csv'
+PLAYERS_WITH_KMEANS_CLUSTER_PATH= 'datasets/players_kmeans_cluster.csv'
 
 def save_dict_to_csv_file(data, file, header):
     try:
@@ -121,7 +124,8 @@ def calculateCustomRanking(kast, kills, deaths, assists, adr, numberOfRoundsInMa
 def data_set_processing():
     df = pd.read_csv(RESULTS_DATASET_FILE_PATH,  encoding='utf-8')
     dfPlayers = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
-
+    kmeans_cluster = get_players_cluster()
+    print(kmeans_cluster)
     team_to_num = convert_team_to_num()
     player_to_num = convert_player_to_num()
     map_to_num = convert_map_to_num()
@@ -179,6 +183,7 @@ def data_set_processing():
                     #dicts['player_' + str(team1num) + '_team_1_country'] = country_to_num[row['player_name']]
                     #dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
                     dicts['player_' + str(team1num) + '_team_1_country_rating'] = player_w_avg_country_rating[row['player_name']]
+                    dicts['player_' + str(team1num) + '_team_1_kmeans_cluster'] = kmeans_cluster[row['player_name']]
 
                     team1num=team1num+1 # increase team1 players
                     if row['player_name'] in avg_custom_rating:
@@ -198,6 +203,7 @@ def data_set_processing():
                     #dicts['player_' + str(team2num) + '_team_2_country'] = country_to_num[row['player_name']]
                     #dicts['player_' + str(team1num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
                     dicts['player_' + str(team2num) + '_team_2_country_rating'] = player_w_avg_country_rating[row['player_name']]
+                    dicts['player_' + str(team2num) + '_team_2_kmeans_cluster'] = kmeans_cluster[row['player_name']]
 
                     team2num=team2num+1  # increase team1 players
                     if row['player_name'] in avg_custom_rating:
@@ -225,3 +231,41 @@ def data_set_processing():
     df = pd.DataFrame.from_dict(dicts_array) 
     df.to_csv (FINAL_DATASET_CUSTOM_RATING_FILE_PATH, index = False, header=True)
     df.to_csv (FINAL_DATASET_WITH_COUNTRY_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH, index = False, header=True)
+
+def average_rating_for_players_for_kmeans():
+    players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills', 'assists', 'deaths', 'hs', 'rating', 'kast', 'adr'].mean()
+    dictsArray = []
+    print('DOSAO OVDE')
+
+    for item in avg_players_rating.values:
+        dicts = {}
+
+        dicts['player_name'] =item[0]
+        dicts['kills'] = item[1]
+        dicts['assists'] = item[2]
+        dicts['deaths'] = item[3]
+        dicts['hs'] = item[4]
+        dicts['rating'] = item[5] 
+    
+        kastNum= item[6]
+        if math.isnan(kastNum):
+            kastNum= players_matches['kast'].mean()
+        dicts['kast']=kastNum
+
+        adrNum= item[7]
+        if math.isnan(adrNum):
+            adrNum= players_matches['adr'].mean()
+        dicts['adr']=adrNum
+
+        dictsArray.append(dicts)
+
+    df = pd.DataFrame.from_dict(dictsArray) 
+
+    df.to_csv(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, index = False, header=True)
+
+def get_players_cluster():
+    player_cluster = pd.read_csv(PLAYERS_WITH_KMEANS_CLUSTER_PATH, index_col=0,  encoding='utf-8').to_dict()
+
+    return player_cluster['cluster']

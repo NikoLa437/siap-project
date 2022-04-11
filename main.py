@@ -1,8 +1,8 @@
 import csv
 import pandas as pd
-
 from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
-
+from data_preprocessing import merge_country_and_avg_rating, data_set_processing, FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH, FINAL_DATASET_CUSTOM_RATING_FILE_PATH
+from data_preprocessing import FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH,average_rating_for_players_for_kmeans,PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, PLAYERS_WITH_KMEANS_CLUSTER_PATH
 # from algorithms.neural_network import NeuralNetwork
 from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
@@ -11,6 +11,7 @@ from data_preprocessing import get_country_percentage_in_dataset, data_set_proce
 from random_forest import RandomForestRegressorAlgorithm
 
 from algorithms.factory import AlgorithmFactory
+from algorithms.kmeans import KmeansAlgorithm
 
 
 # from algorithms.neural_network import NeuralNetwork
@@ -63,9 +64,14 @@ def readStatisticsForPlayer(playerName):
                                 sumNumberOfDeath / numberOfRecords, sumMatchRating / numberOfRecords)
 
 
+
 def main():
     data_set_processing()
 
+    #kmeans = KmeansAlgorithm('datasets/players_avg_kmeans_data.csv')
+    #kmeans.fit(5)
+    #kmeans.visualizing_results()
+    #kmeans.predict_and_save_to_file_player_clusters('datasets/players_avg_kmeans_data.csv','datasets/players_kmeans_cluster.csv')
     # team1 = input('Unesi prvi tim: ')
     # team2 = input('Unesi drugi tim: ')
     # team1players = []
@@ -96,7 +102,15 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
+    #average_rating_for_players_for_kmeans()
+
+    #kmeans = KmeansAlgorithm(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH)
+    #kmeans.fit(11)
+    #kmeans.visualizing_results()
+    #kmeans.predict_and_save_to_file_player_clusters(PLAYERS_AVG_K_MEANS_DATA_FILE_PATH, PLAYERS_WITH_KMEANS_CLUSTER_PATH)
+    
+    #data_set_processing()
+
     # average_ranking_for_players()
     # convert_country_to_num()
     # convert_country_to_num()
@@ -107,8 +121,12 @@ if __name__ == "__main__":
     # rfalg.predict()
     # merge_country_and_avg_rating()
     # print(get_country_percentage_in_dataset(5))
-    # random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
-    #                                             FINAL_DATASET_WITH_COUNTRY_FILE_PATH).with_country(use_commonness=True)
+
+    # use_players_country=False, use_avg_country_rating=False,
+    #                 use_commonness=False, use_players_country_percentage=False,
+    #                 use_avg_team_country_rating=False
+    #random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+    #                                             FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH)#.with_country(use_commonness=True)
     # # False, True, False,
     # #                                                                                                False, False)
     # random_forest_alg.load_data()
@@ -120,10 +138,10 @@ if __name__ == "__main__":
     # nnetwork.fit()
     # nnetwork.predict()
 
-    extreme_gradient_boosting_alg = AlgorithmFactory.create("XG_BOOST_REGRESSOR", FINAL_DATASET_CUSTOM_RATING_FILE_PATH)
-    extreme_gradient_boosting_alg.load_data()
-    extreme_gradient_boosting_alg.fit()
-    extreme_gradient_boosting_alg.predict()
+    #extreme_gradient_boosting_alg = AlgorithmFactory.create("XG_BOOST_REGRESSOR", FINAL_DATASET_CUSTOM_RATING_FILE_PATH)
+    #extreme_gradient_boosting_alg.load_data()
+    #extreme_gradient_boosting_alg.fit()
+    #extreme_gradient_boosting_alg.predict()
 
 
     # random_forest_alg = AlgorithmFactory.create("RANDOM_FOREST_REGRESSOR", FINAL_DATASET_WITH_COUNTRY_FILE_PATH)
@@ -169,9 +187,10 @@ if __name__ == "__main__":
     # extreme_gradient_boosting_alg.fit()
     # extreme_gradient_boosting_alg.predict()
 
-    # random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
-    #                                             FINAL_DATASET_CUSTOM_RATING_FILE_PATH).with_custom_rating()#.with_country()
-    # random_forest_alg.load_data()
-    # random_forest_alg.fit()
-    # random_forest_alg.predict()
+    random_forest_alg = AlgorithmFactory.create(AlgorithmFactory.get_algorithm_names()[1],
+                                                FINAL_DATASET_CUSTOM_RATING_FILE_PATH)#.with_custom_rating()#.with_country()
+    random_forest_alg.load_data()
+    random_forest_alg.fit()
+    random_forest_alg.predict()
+
 
