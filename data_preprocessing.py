@@ -121,7 +121,7 @@ def data_set_processing():
     df = pd.read_csv(RESULTS_DATASET_FILE_PATH,  encoding='utf-8')
     dfPlayers = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
     kmeans_cluster = get_players_cluster()
-
+    print(kmeans_cluster)
     team_to_num = convert_team_to_num()
     player_to_num = convert_player_to_num()
     map_to_num = convert_map_to_num()
@@ -227,10 +227,11 @@ def data_set_processing():
     df = pd.DataFrame.from_dict(dicts_array) 
     df.to_csv (FINAL_DATASET_CUSTOM_RATING_FILE_PATH, index = False, header=True)
     df.to_csv (FINAL_DATASET_WITH_COUNTRY_FILE_PATH, index = False, header=True)
+    df.to_csv (FINAL_DATASET_PLAYERS_WITH_CLUSTER_FILE_PATH, index = False, header=True)
 
 def average_rating_for_players_for_kmeans():
     players_matches = pd.read_csv(PLAYERS_DATASET_FILE_PATH,  encoding='utf-8')
-    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills', 'assists', 'deaths', 'hs', 'rating', 'kast', 'kddiff', 'adr'].mean()
+    avg_players_rating = players_matches.groupby('player_name', as_index=False)['player_name', 'kills', 'assists', 'deaths', 'hs', 'rating', 'kast', 'adr'].mean()
     dictsArray = []
     print('DOSAO OVDE')
 
@@ -243,21 +244,16 @@ def average_rating_for_players_for_kmeans():
         dicts['deaths'] = item[3]
         dicts['hs'] = item[4]
         dicts['rating'] = item[5] 
-        valueForKast= item[6]
-        if math.isnan(item[6]):
-            valueForKast= players_matches['kast'].mean()
-        dicts['kast'] = valueForKast
+    
+        kastNum= item[6]
+        if math.isnan(kastNum):
+            kastNum= players_matches['kast'].mean()
+        dicts['kast']=kastNum
 
-        valueForKDiff=item[7]
-        if math.isnan(item[7]):
-            valueForKDiff=players_matches['kddiff'].mean()
-        dicts['kddiff'] = valueForKDiff
-
-        valueForAdr=item[8]
-        if math.isnan(item[8]):
-            valueForAdr=players_matches['adr'].mean()
-
-        dicts['adr'] = valueForAdr
+        adrNum= item[7]
+        if math.isnan(adrNum):
+            adrNum= players_matches['adr'].mean()
+        dicts['adr']=adrNum
 
         dictsArray.append(dicts)
 

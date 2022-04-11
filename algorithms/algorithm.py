@@ -83,12 +83,12 @@ class BaseAlgorithm(ABC):
 
                 if self.use_custom_rating:
                     data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
-                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_custom_rating"}']]
-                                         #match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_kmeans_cluster"}']
+                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_custom_rating"}'],
+                                        match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_kmeans_cluster"}']]
                 else:
                     data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
-                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}']]
-                                         #match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_kmeans_cluster"}']
+                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}'],
+                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_kmeans_cluster"}']]
 
                 if self.use_country_data:
                     if self.country_info_provider.use_players_country:
@@ -158,12 +158,12 @@ class BaseAlgorithm(ABC):
         print(rating_offset, country_features_ofset)
         for row in self.x_test:
             row[6 + rating_offset] = ratings_dict[row[-10 if not self.use_country_data else country_features_ofset]]
-            row[8 + rating_offset] = ratings_dict[row[-9 if not self.use_country_data else country_features_ofset + 1]]
-            row[10 + rating_offset] = ratings_dict[row[-8 if not self.use_country_data else country_features_ofset + 2]]
-            row[12 + rating_offset] = ratings_dict[row[-7 if not self.use_country_data else country_features_ofset + 3]]
-            row[14 + rating_offset] = ratings_dict[row[-6 if not self.use_country_data else country_features_ofset + 4]]
-            row[16 + rating_offset] = ratings_dict[row[-5 if not self.use_country_data else country_features_ofset + 5]]
-            row[18 + rating_offset] = ratings_dict[row[-4 if not self.use_country_data else country_features_ofset + 6]]
-            row[20 + rating_offset] = ratings_dict[row[-3 if not self.use_country_data else country_features_ofset + 7]]
-            row[22 + rating_offset] = ratings_dict[row[-2 if not self.use_country_data else country_features_ofset + 8]]
-            row[24 + rating_offset] = ratings_dict[row[-1 if not self.use_country_data else country_features_ofset + 9]]
+            row[9 + rating_offset] = ratings_dict[row[-9 if not self.use_country_data else country_features_ofset + 1]]
+            row[12 + rating_offset] = ratings_dict[row[-8 if not self.use_country_data else country_features_ofset + 2]]
+            row[15 + rating_offset] = ratings_dict[row[-7 if not self.use_country_data else country_features_ofset + 3]]
+            row[18 + rating_offset] = ratings_dict[row[-6 if not self.use_country_data else country_features_ofset + 4]]
+            row[21 + rating_offset] = ratings_dict[row[-5 if not self.use_country_data else country_features_ofset + 5]]
+            row[24 + rating_offset] = ratings_dict[row[-4 if not self.use_country_data else country_features_ofset + 6]]
+            row[27 + rating_offset] = ratings_dict[row[-3 if not self.use_country_data else country_features_ofset + 7]]
+            row[30 + rating_offset] = ratings_dict[row[-2 if not self.use_country_data else country_features_ofset + 8]]
+            row[33 + rating_offset] = ratings_dict[row[-1 if not self.use_country_data else country_features_ofset + 9]]
