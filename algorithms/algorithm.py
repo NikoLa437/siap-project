@@ -86,7 +86,7 @@ class BaseAlgorithm(ABC):
                                          match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_custom_rating"}']]
                 else:
                     data_of_interest += [match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}'],
-                                     match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}']]
+                                         match_data[f'{"player_"}{p_idx}{"_team_"}{t_idx}{"_rating"}']]
 
                 if self.use_country_data:
                     if self.country_info_provider.use_players_country:
