@@ -20,3 +20,4 @@ class ExtremeGradientBoostingAlgorithm(BaseAlgorithm):
         self.model = xgb.train(self.parameters['param'], d_train, self.parameters['num_round'],
                                eval_list, early_stopping_rounds=self.parameters['early_stopping_rounds'])
         self.x_test = xgb.DMatrix(self.x_test)
+

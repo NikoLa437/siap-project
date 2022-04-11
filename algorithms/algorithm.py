@@ -108,8 +108,9 @@ class BaseAlgorithm(ABC):
     def predict(self):
         print("Started prediction")
         y_pred = self.model.predict(self.x_test)
-        y_pred = self.round_predictions(y_pred)
-        print("Accuracy: ", metrics.accuracy_score(self.y_test, y_pred))
+        y_pred_r = self.round_predictions(y_pred)
+        print("Accuracy: ", metrics.accuracy_score(self.y_test, y_pred_r))
+        print("Accuracy log loss: ", metrics.log_loss(self.y_test, y_pred))
 
     @staticmethod
     def round_predictions(y_pred):
