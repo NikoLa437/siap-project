@@ -111,7 +111,11 @@ def calculateCustomRanking(kast, kills, deaths, assists, adr, numberOfRoundsInMa
     if math.isnan(fkdiff):
         adr = 0
     impact = 2.13 * kills / numberOfRoundsInMatch + 0.42 * assists / numberOfRoundsInMatch - 0.41
-    custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch + 0.08 * hs + 0.05 * fkdiff - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+    custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch + 0.08 * hs / numberOfRoundsInMatch + 0.4 * fkdiff / numberOfRoundsInMatch - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+    # custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+    # custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch + 0.08 * hs / numberOfRoundsInMatch - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+    # custom_rating = 0.0073 * kast + 0.3591 * kills / numberOfRoundsInMatch + 0.4 * fkdiff / numberOfRoundsInMatch - 0.5329 * deaths / numberOfRoundsInMatch + 0.2372 * impact + 0.0032 * adr + 0.1587
+
     return custom_rating
 
 def data_set_processing():
