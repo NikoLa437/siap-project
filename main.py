@@ -6,6 +6,7 @@ from data_preprocessing import merge_country_and_avg_rating, data_set_processing
 from algorithms.neural_network import NeuralNetwork
 from data_preprocessing import get_country_percentage_in_dataset, data_set_processing, \
     FINAL_DATASET_WITH_COUNTRY_FILE_PATH, FINAL_DATASET_FILE_PATH
+
 from random_forest import RandomForestRegressorAlgorithm
 
 from algorithms.factory import AlgorithmFactory
@@ -112,6 +113,21 @@ if __name__ == "__main__":
     # random_forest_alg.load_data()
     # random_forest_alg.fit()
     # random_forest_alg.predict()
+
+    nnetwork = NeuralNetwork(FINAL_DATASET_WITH_COUNTRY_FILE_PATH)
+    nnetwork.load_data()
+    nnetwork.fit()
+    nnetwork.predict()
+
+    extreme_gradient_boosting_alg = AlgorithmFactory.create("XG_BOOST_REGRESSOR", FINAL_DATASET_CUSTOM_RATING_FILE_PATH)
+    extreme_gradient_boosting_alg.load_data()
+    extreme_gradient_boosting_alg.fit()
+    extreme_gradient_boosting_alg.predict()
+
+    random_forest_alg = AlgorithmFactory.create("RANDOM_FOREST_REGRESSOR", FINAL_DATASET_WITH_COUNTRY_FILE_PATH)
+    random_forest_alg.load_data()
+    random_forest_alg.fit()
+    random_forest_alg.predict()
     # for algorithm_name in AlgorithmFactory.get_algorithm_names():
     #     # alg = AlgorithmFactory.create(algorithm_name, FINAL_DATASET_CUSTOM_RATING_FILE_PATH)#.with_custom_rating()
     #     # alg.with_country(use_players_country=True, use_avg_country_rating=True, use_commonness=True,
