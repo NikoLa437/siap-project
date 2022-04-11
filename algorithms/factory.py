@@ -1,6 +1,7 @@
 from algorithms.extreme_gradient_boosting import ExtremeGradientBoostingAlgorithm
 from algorithms.random_forest import RandomForestRegressorAlgorithm
 from algorithms.neural_network import NeuralNetwork
+import matplotlib
 
 
 class AlgorithmFactory:
@@ -16,11 +17,16 @@ class AlgorithmFactory:
     def create_extreme_gradient_boosting_regressor(data_path_or_data):
         parameters = {
             'param': {
-                'max_depth': 5,
-                'eta': 1,
+                'max_depth': 6,
+                'eta': 0.15,
                 'objective': 'binary:logistic',
                 'nthread': 4,
-                'eval_metric': 'logloss'
+                # 'eval_metric': 'logloss',
+                'gamma': 0.25,
+                'reg_alpha': 0.5,
+                'reg_lambda': 0.5,
+                'subsample': 0.8,
+                'colsample_bytree': 0.8
             },
             'num_round': 10,
             'early_stopping_rounds': 10,
